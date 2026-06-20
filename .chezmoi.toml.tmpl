@@ -1,0 +1,19 @@
+{{/*
+  .chezmoi.toml.tmpl
+  Chezmoi procesa este archivo SOLO durante "chezmoi init" (no en
+  "chezmoi apply"). Las preguntas que hace aquí se guardan en
+  ~/.config/chezmoi/chezmoi.toml y quedan disponibles como variables
+  ({{ .kb_layout }}, {{ .kb_variant }}) para cualquier plantilla del
+  repo (p.ej. dot_config/hypr/hyprland.conf.tmpl).
+
+  promptStringOnce solo pregunta la primera vez (si chezmoi.toml ya
+  tiene el valor, no vuelve a preguntar) — así una reinstalación en la
+  misma máquina no te vuelve a interrogar a menos que borres
+  ~/.config/chezmoi/chezmoi.toml.
+*/}}
+{{- $kbLayout := promptStringOnce . "kb_layout" "Layout base de teclado XKB (ej: us, es)" "us" -}}
+{{- $kbVariant := promptStringOnce . "kb_variant" "Variante de teclado para Hyprland (vacío = qwerty normal; ej: dvorakes, dvorak)" "" -}}
+
+[data]
+    kb_layout  = {{ $kbLayout  | quote }}
+    kb_variant = {{ $kbVariant | quote }}
