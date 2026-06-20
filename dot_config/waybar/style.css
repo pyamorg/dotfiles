@@ -76,6 +76,21 @@ tooltip label {
     color: #a1a1aa;
 }
 
+#custom-updates.loading {
+    color: #52525b;
+    animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.35; }
+    100% { opacity: 1; }
+}
+
+#custom-updates.pending {
+    color: #c9a227;
+}
+
 #custom-updates.updated {
     color: #71717a;
 }

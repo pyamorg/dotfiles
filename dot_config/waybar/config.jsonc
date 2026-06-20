@@ -82,10 +82,12 @@
     },
 
     "custom/updates": {
-        "exec": "checkupdates 2>/dev/null | wc -l",
-        "interval": 3600,
-        "format": " {}",
-        "on-click": "kitty -e sudo pacman -Syu"
+        "exec": "~/.config/waybar/scripts/updates.sh",
+        "return-type": "json",
+        "format": "{}",
+        "tooltip": true,
+        "on-click": "kitty -e sudo pacman -Syu",
+        "signal": 8
     },
 
     "backlight": {
@@ -105,17 +107,20 @@
 
     "cpu": {
         "format": " {usage}%",
+        "tooltip-format": "Uso de CPU: {usage}%\nCarga: {load}",
         "interval": 2,
         "on-click": "kitty -e btop"
     },
 
     "memory": {
         "format": " {percentage}%",
+        "tooltip-format": "RAM: {used:0.1f}GB / {total:0.1f}GB ({percentage}%)",
         "interval": 2
     },
 
     "disk": {
         "format": " {percentage_used}%",
+        "tooltip-format": "Disco: {used} / {total} usados ({percentage_used}%)",
         "path": "/"
     },
 
@@ -146,7 +151,9 @@
 
     "battery": {
         "format": "{capacity}% {icon}",
+        "format-charging": "{capacity}% ",
         "format-icons": ["", "", "", "", ""],
+        "tooltip-format": "Bateria: {capacity}%\nTiempo restante: {time}",
         "states": {
             "warning": 30,
             "critical": 15
