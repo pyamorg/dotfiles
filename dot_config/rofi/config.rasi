@@ -1,0 +1,88 @@
+/* ~/.config/rofi/config.rasi */
+/* Tema Catppuccin Mocha, a juego con waybar-style.css */
+
+configuration {
+    show-icons: true;
+    icon-theme: "Papirus";   // cambia esto al nombre de tu icon theme actual si usas otro
+    display-drun: "Apps:";
+    drun-display-format: "{name}";
+}
+
+* {
+    bg0:     #1e1e2eee;
+    bg1:     #313244;
+    fg0:     #cdd6f4;
+    fg1:     #a6adc8;
+    accent:  #89b4fa;
+    accent2: #cba6f7;
+    red:     #f38ba8;
+
+    background-color: transparent;
+    text-color: @fg0;
+    font: "JetBrainsMono Nerd Font 12";
+}
+
+window {
+    width: 600px;
+    location: center;
+    anchor: center;
+    background-color: @bg0;
+    border: 2px;
+    border-color: @accent;
+    border-radius: 14px;
+    padding: 16px;
+}
+
+mainbox {
+    children: [inputbar, listview];
+    spacing: 12px;
+    background-color: transparent;
+}
+
+inputbar {
+    background-color: @bg1;
+    border-radius: 10px;
+    padding: 10px 14px;
+    children: [prompt, entry];
+}
+
+prompt {
+    text-color: @accent;
+    font: "JetBrainsMono Nerd Font Bold 12";
+}
+
+entry {
+    placeholder: "Buscar...";
+    placeholder-color: @fg1;
+    text-color: @fg0;
+}
+
+listview {
+    lines: 8;
+    columns: 1;
+    spacing: 4px;
+    background-color: transparent;
+    cycle: true;
+}
+
+element {
+    padding: 8px 10px;
+    border-radius: 8px;
+    background-color: transparent;
+}
+
+element selected {
+    background-color: @accent;
+    text-color: @bg0;
+}
+
+element-icon {
+    size: 24px;
+    vertical-align: 0.5;
+}
+
+element-text {
+    vertical-align: 0.5;
+    horizontal-align: 0.0;
+    margin: 0 0 0 8px;
+}

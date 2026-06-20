@@ -1,0 +1,39 @@
+/* ~/.config/wlogout/style.css */
+
+* {
+    background-image: none;
+    font-family: "JetBrainsMono Nerd Font", "Noto Color Emoji", sans-serif;
+}
+
+window {
+    background-color: rgba(30, 30, 46, 0.75);
+}
+
+button {
+    color: #cdd6f4;
+    background-color: #313244;
+    border-style: solid;
+    border-width: 2px;
+    border-color: #45475a;
+    border-radius: 16px;
+    margin: 10px;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #45475a;
+    border-color: #89b4fa;
+}
+
+button:focus {
+    background-color: #89b4fa;
+    color: #1e1e2e;
+}
+
+/* Cada botón usa un emoji como "icono" via ::before, así no
+   necesitas archivos .png/.svg sueltos */
+#lock::before     { content: "🔒"; display: block; font-size: 48px; margin-bottom: 12px; }
+#logout::before   { content: "🚪"; display: block; font-size: 48px; margin-bottom: 12px; }
+#suspend::before  { content: "😴"; display: block; font-size: 48px; margin-bottom: 12px; }
+#reboot::before   { content: "🔄"; display: block; font-size: 48px; margin-bottom: 12px; }
+#shutdown::before { content: "⏻"; display: block; font-size: 48px; margin-bottom: 12px; }

@@ -1,0 +1,63 @@
+/* ~/.config/waybar/style.css */
+/* Paleta neutra gris oscuro, un solo acento sobrio (azul grisáceo apagado) */
+
+* {
+    font-family: "JetBrainsMono Nerd Font", sans-serif;
+    font-size: 13px;
+}
+
+window#waybar {
+    background: rgba(24, 24, 27, 0.92);
+    color: #d4d4d8;
+    border-radius: 0 0 8px 8px;
+    border-bottom: 1px solid #3f3f46;
+}
+
+#workspaces button {
+    padding: 0 8px;
+    color: #71717a;
+}
+
+#workspaces button.active {
+    color: #d4d4d8;
+    border-bottom: 2px solid #6b7280;
+}
+
+#window {
+    color: #71717a;
+    font-style: normal;
+}
+
+#clock,
+#cpu,
+#memory,
+#pulseaudio,
+#network,
+#battery,
+#tray {
+    padding: 0 10px;
+    color: #d4d4d8;
+}
+
+#cpu, #memory {
+    color: #a1a1aa;
+}
+
+#battery.warning {
+    color: #c9a227;
+}
+
+#battery.critical {
+    color: #b34747;
+}
+
+tooltip {
+    background: #18181b;
+    border: 1px solid #3f3f46;
+    border-radius: 6px;
+}
+
+tooltip label {
+    color: #d4d4d8;
+    padding: 6px;
+}

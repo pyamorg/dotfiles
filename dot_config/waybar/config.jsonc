@@ -1,0 +1,160 @@
+// ~/.config/waybar/config.jsonc
+{
+    "layer": "top",
+    "position": "top",
+    "height": 30,
+    "spacing": 4,
+    "margin-top": 6,
+    "margin-left": 10,
+    "margin-right": 10,
+
+    "modules-left": ["hyprland/workspaces", "hyprland/window", "mpris"],
+    "modules-center": ["clock"],
+    "modules-right": [
+        "privacy",
+        "custom/updates",
+        "backlight",
+        "bluetooth",
+        "network",
+        "pulseaudio",
+        "cpu",
+        "memory",
+        "disk",
+        "keyboard-state",
+        "battery",
+        "tray"
+    ],
+
+    "hyprland/workspaces": {
+        "format": "{id} {icon}",
+        "on-click": "activate",
+        "format-icons": {
+            "1": "\uf0ac",
+            "2": "\uf120",
+            "3": "\uf249",
+            "4": "\uf07b",
+            "5": "\uf086",
+            "6": "\uf001",
+            "7": "\uf11b",
+            "8": "\uf1fc",
+            "9": "\uf013",
+            "10": "\uf08d",
+            "default": ""
+        }
+    },
+
+    "hyprland/window": {
+        "max-length": 40,
+        "separate-outputs": true
+    },
+
+    "mpris": {
+        "format": "{player_icon} {dynamic}",
+        "format-paused": "{status_icon} {dynamic}",
+        "player-icons": { "default": "▶", "spotify": "" },
+        "status-icons": { "paused": "⏸" },
+        "max-length": 30
+    },
+
+    "clock": {
+        "format": "{:%H:%M  %d/%m/%Y}",
+        "tooltip-format": "<tt>{calendar}</tt>",
+        "calendar": {
+            "mode": "month",
+            "weeks-pos": "right",
+            "on-scroll": 1,
+            "format": {
+                "months": "<span color='#d4d4d8'><b>{}</b></span>",
+                "days": "<span color='#a1a1aa'>{}</span>",
+                "weekdays": "<span color='#71717a'><b>{}</b></span>",
+                "today": "<span color='#d4d4d8'><b><u>{}</u></b></span>"
+            }
+        }
+    },
+
+    "privacy": {
+        "icon-spacing": 4,
+        "icon-size": 14,
+        "modules": [
+            { "type": "screenshare" },
+            { "type": "audio-in" }
+        ]
+    },
+
+    "custom/updates": {
+        "exec": "checkupdates 2>/dev/null | wc -l",
+        "interval": 3600,
+        "format": " {}",
+        "on-click": "kitty -e sudo pacman -Syu"
+    },
+
+    "backlight": {
+        "format": "{icon} {percent}%",
+        "format-icons": ["", "", ""],
+        "on-scroll-up": "brightnessctl set 5%+",
+        "on-scroll-down": "brightnessctl set 5%-"
+    },
+
+    "bluetooth": {
+        "format": " {status}",
+        "format-connected": " {device_alias}",
+        "format-connected-battery": " {device_alias} {device_battery_percentage}%",
+        "tooltip-format": "{controller_alias}\t{controller_address}",
+        "on-click": "blueman-manager"
+    },
+
+    "cpu": {
+        "format": " {usage}%",
+        "interval": 2,
+        "on-click": "kitty -e btop"
+    },
+
+    "memory": {
+        "format": " {percentage}%",
+        "interval": 2
+    },
+
+    "disk": {
+        "format": " {percentage_used}%",
+        "path": "/"
+    },
+
+    "keyboard-state": {
+        "numlock": true,
+        "capslock": true,
+        "format": "{name} {icon}",
+        "format-icons": { "locked": "", "unlocked": "" }
+    },
+
+    "pulseaudio": {
+        "format": "{volume}% {icon}",
+        "format-muted": " muted",
+        "format-icons": {
+            "default": ["", "", ""]
+        },
+        "on-click": "pavucontrol",
+        "scroll-step": 5
+    },
+
+    "network": {
+        "format-wifi": " {essid} ({signalStrength}%)",
+        "format-ethernet": " Ethernet",
+        "format-disconnected": " Sin conexión",
+        "tooltip-format": "{ifname}: {ipaddr}/{cidr}",
+        "on-click": "nm-connection-editor"
+    },
+
+    "battery": {
+        "format": "{capacity}% {icon}",
+        "format-icons": ["", "", "", "", ""],
+        "states": {
+            "warning": 30,
+            "critical": 15
+        }
+    },
+
+    "tray": {
+        "spacing": 10,
+        "icon-size": 18
+    }
+}
