@@ -299,7 +299,16 @@ bindel = ,XF86MonBrightnessUp, exec, brightnessctl set +5%
 bindel = ,XF86MonBrightnessDown, exec, brightnessctl -n set 5%-
 
 # Bloquear pantalla
-bind = $mainMod, Escape, exec, hyprlock
+bind = $mainMod, Escape, exec, ~/.local/share/quickshell-lockscreen/lock.sh
 
 # Menú de apagado/cierre de sesión (wlogout)
 bind = $mainMod SHIFT, Escape, exec, wlogout
+
+
+#####################
+### Excepciones
+#####################
+
+windowrule = match:title ^(File Upload.*)$, float on
+windowrule = match:title ^(File Upload.*)$, center 1
+windowrule = match:title ^(File Upload.*)$, size 70% 80%
