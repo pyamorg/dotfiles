@@ -1,5 +1,5 @@
 /* ~/.config/waybar/style.css */
-/* Paleta neutra gris oscuro, un solo acento sobrio (azul grisáceo apagado) */
+/* Versión simple: cápsulas individuales, bien separadas, sin agrupaciones */
 
 * {
     font-family: "JetBrainsMono Nerd Font", sans-serif;
@@ -7,40 +7,44 @@
 }
 
 window#waybar {
-    background: rgba(24, 24, 27, 0.92);
+    background: transparent;
+}
+
+#clock,
+#custom-weather,
+#workspaces,
+#custom-swaync,
+#tray,
+#cpu,
+#memory,
+#network,
+#bluetooth,
+#pulseaudio,
+#pulseaudio-microphone,
+#battery {
+    background: rgba(24, 24, 27, 0.85);
+    border: 1px solid #3f3f46;
+    border-radius: 999px;
+    padding: 0 12px;
     color: #d4d4d8;
-    border-radius: 0 0 8px 8px;
-    border-bottom: 1px solid #3f3f46;
 }
 
 #workspaces button {
-    padding: 0 8px;
+    padding: 0 6px;
     color: #71717a;
+    font-size: 10px;
 }
 
 #workspaces button.active {
     color: #d4d4d8;
-    border-bottom: 2px solid #6b7280;
 }
 
-#window {
-    color: #71717a;
-    font-style: normal;
+#clock {
+    font-weight: bold;
 }
 
-#clock,
-#cpu,
-#memory,
-#pulseaudio,
-#network,
-#battery,
-#tray {
-    padding: 0 10px;
-    color: #d4d4d8;
-}
-
-#cpu, #memory {
-    color: #a1a1aa;
+#bluetooth.disabled, #bluetooth.off {
+    color: #52525b;
 }
 
 #battery.warning {
@@ -51,68 +55,22 @@ window#waybar {
     color: #b34747;
 }
 
+#network.disconnected {
+    color: #b34747;
+}
+
+#pulseaudio.muted,
+#pulseaudio-microphone.muted {
+    color: #71717a;
+}
+
 tooltip {
     background: #18181b;
     border: 1px solid #3f3f46;
-    border-radius: 6px;
+    border-radius: 10px;
 }
 
 tooltip label {
     color: #d4d4d8;
     padding: 6px;
-}
-
-/* --- módulos nuevos: bluetooth, backlight, privacy, updates, etc. --- */
-#bluetooth, #backlight, #custom-updates, #disk, #keyboard-state, #mpris {
-    padding: 0 10px;
-    color: #d4d4d8;
-}
-
-#bluetooth.disabled, #bluetooth.off {
-    color: #71717a;
-}
-
-#custom-updates {
-    color: #a1a1aa;
-}
-
-#custom-updates.loading {
-    color: #52525b;
-    animation: pulse 1.2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-    0% { opacity: 1; }
-    50% { opacity: 0.35; }
-    100% { opacity: 1; }
-}
-
-#custom-updates.pending {
-    color: #c9a227;
-}
-
-#custom-updates.updated {
-    color: #71717a;
-}
-
-#privacy {
-    padding: 0 6px;
-}
-
-#privacy-item {
-    color: #c9a227;
-}
-
-#keyboard-state label {
-    padding: 0 4px;
-    color: #71717a;
-}
-
-#keyboard-state label.locked {
-    color: #d4d4d8;
-}
-
-#mpris {
-    color: #a1a1aa;
-    font-style: italic;
 }
