@@ -1,7 +1,18 @@
 /* ~/.config/swaync/style.css */
-/* Tema "nova-dark" de JaKooLit/Hyprland-Dots. El original importaba
-   colores de pywal (../../.cache/wal/colors-waybar.css); aquí se usa
-   la misma paleta fija que waybar/rofi/wlogout. */
-@import '../waybar/style.css';
+/* Tema "nova-dark" de JaKooLit/Hyprland-Dots, con paleta propia
+   (independiente de waybar, para no depender de qué tenga ese archivo
+   en cada momento). La transparencia del panel viene de fábrica en el
+   propio tema vía alpha(@background, .55) — solo había que definir
+   bien estas variables. */
+
+@define-color background     #18181b;
+@define-color background-sec #27272a;
+@define-color foreground     #d4d4d8;
+@define-color color1         #3f3f46;
+@define-color color2         #b34747;
+@define-color color3         #71717a;
+@define-color color5         #c9a227;
+@define-color color6         #a1a1aa;
+
 @import 'themes/nova-dark/notifications.css';
 @import 'themes/nova-dark/central_control.css';
