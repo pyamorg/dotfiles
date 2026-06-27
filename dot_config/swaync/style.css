@@ -1,0 +1,7 @@
+/* ~/.config/swaync/style.css */
+/* Tema "nova-dark" de JaKooLit/Hyprland-Dots. El original importaba
+   colores de pywal (../../.cache/wal/colors-waybar.css); aquí se usa
+   la misma paleta fija que waybar/rofi/wlogout. */
+@import '../waybar/style.css';
+@import 'themes/nova-dark/notifications.css';
+@import 'themes/nova-dark/central_control.css';
