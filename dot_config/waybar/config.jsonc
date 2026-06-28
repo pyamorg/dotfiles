@@ -84,7 +84,7 @@
         "on-click": "kitty -e btop"
     },
     "memory": {
-        "format": " {percentage}%",
+        "format": " {percentage}%",
         "interval": 2,
         "on-click": "kitty -e btop"
     },
