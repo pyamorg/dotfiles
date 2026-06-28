@@ -30,6 +30,7 @@
     "clock": {
         "format": "{:%H:%M  %d/%m}",
         "tooltip-format": "<tt><small>{calendar}</small></tt>",
+        "on-click": "gnome-calendar",
         "calendar": {
             "mode": "month",
             "weeks-pos": "right",
@@ -44,6 +45,7 @@
     },
     "custom/weather": {
         "format": "{}",
+        "on-click": "xdg-open https://wttr.in/Madrid",
         "interval": 3600,
         "return-type": "json",
         "exec": "~/.config/hypr/scripts/Weather.py",
