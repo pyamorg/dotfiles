@@ -312,3 +312,28 @@ bind = $mainMod SHIFT, Escape, exec, wlogout
 windowrule = match:title ^(File Upload.*)$, float on
 windowrule = match:title ^(File Upload.*)$, center 1
 windowrule = match:title ^(File Upload.*)$, size 70% 80%
+
+
+#####################
+### Mejoras de i3
+#####################
+
+# Crea stacking groups
+bind = $mainMod, code:25, togglegroup        # posición física de W
+
+# Moverse entre las ventanas apiladas dentro del grupo
+bind = $mainMod ALT, code:43, changegroupactive, b   # posición física de H (Izquierda/Anterior)
+bind = $mainMod ALT, code:46, changegroupactive, f   # posición física de L (Derecha/Siguiente)bind = $mainMod, code:40, exec, $menu        # posición física de D
+
+## MAGIC WORKSPACE
+# Mod + Shift + M (fisica): Envía al scratchpad
+bind = $mainMod SHIFT, code:58, movetoworkspace, special:magic   
+
+# Mod + M: Muestra/oculta el scratchpad
+bind = $mainMod, code:58, togglespecialworkspace, magic          
+
+# Mod + Alt + M: Extrae la ventana del scratchpad
+bind = $mainMod ALT, code:58, movetoworkspace, +0
+
+# Cambia al último workspace que estabas usando
+bind = $mainMod, Tab, workspace, previous
