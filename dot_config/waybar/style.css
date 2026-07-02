@@ -74,3 +74,11 @@ tooltip label {
     color: #d4d4d8;
     padding: 6px;
 }
+
+#battery.charging {
+    color: #c5a030;
+}
+
+#battery.plugged {
+    color: #a6e3a1;
+}

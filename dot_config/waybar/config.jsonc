@@ -80,7 +80,7 @@
         "icon-size": 16,
         "spacing": 10
     },
-
+    
     "cpu": {
         "format": " {usage}%",
         "interval": 2,
@@ -136,6 +136,8 @@
     },
     "battery": {
         "format": "{icon} {capacity}%",
+        "format-charging": " {capacity}%",
+        "format-plugged": " 100%",
         "format-icons": [
             "",
             "",
@@ -143,11 +145,15 @@
             "",
             ""
         ],
+        "format-time": "{H}h {M}min",
         "states": {
             "warning": 30,
             "critical": 15
         },
         "on-scroll-up": "brightnessctl set 1%+",
-        "on-scroll-down": "brightnessctl -n set 1%-"
+        "on-scroll-down": "brightnessctl -n set 1%-",
+        "tooltip": true,
+        "tooltip-format": "{timeTo} · {power:.1f}W",
+        "on-click-right": "~/.config/hypr/scripts/caffeine.sh"
     }
 }
