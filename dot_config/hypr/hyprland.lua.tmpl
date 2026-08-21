@@ -1,0 +1,304 @@
+-- ~/.config/hypr/hyprland.lua
+-- Traducción del antiguo hyprland.conf a Lua (Hyprland 0.55+).
+-- Gestionado por chezmoi: kb_layout y kb_variant son variables de plantilla.
+
+------------------
+---- MONITORES ----
+------------------
+hl.monitor({
+    output   = "",
+    mode     = "preferred",
+    position = "auto",
+    scale    = 1,
+})
+
+
+---------------------------
+---- PROGRAMAS POR DEFECTO ----
+---------------------------
+local terminal    = "kitty"
+local fileManager = "thunar"
+local menu        = "rofi -show drun"
+local lockscreen  = "~/.local/share/quickshell-lockscreen/lock.sh"
+
+
+-------------------
+---- AUTOSTART ----
+-------------------
+hl.on("hyprland.start", function()
+    hl.exec_cmd("waybar")
+    hl.exec_cmd("hyprpaper")
+    hl.exec_cmd("swaync")
+    hl.exec_cmd("nm-applet --indicator")
+    hl.exec_cmd("hypridle")
+    -- Descomenta si prefieres KWallet en vez de gnome-keyring:
+    -- hl.exec_cmd("/usr/lib/kwalletd6")
+end)
+
+
+-------------------------------
+---- VARIABLES DE ENTORNO ----
+-------------------------------
+hl.env("XCURSOR_SIZE", "24")
+hl.env("QT_QPA_PLATFORMTHEME", "qt5ct")
+-- Necesarias para que xdg-open detecte el entorno gráfico
+hl.env("XDG_CURRENT_DESKTOP", "Hyprland")
+hl.env("XDG_SESSION_TYPE", "wayland")
+hl.env("XDG_SESSION_DESKTOP", "Hyprland")
+
+
+-----------------------
+---- APARIENCIA ----
+-----------------------
+hl.config({
+    general = {
+        gaps_in  = 4,
+        gaps_out = 8,
+        border_size = 2,
+        col = {
+            active_border   = { colors = { "rgba(89b4faee)", "rgba(cba6f7ee)" }, angle = 45 },
+            inactive_border = "rgba(595959aa)",
+        },
+        resize_on_border = true,
+        layout = "dwindle",
+    },
+
+    decoration = {
+        rounding = 8,
+        blur = {
+            enabled = true,
+            size    = 4,
+            passes  = 2,
+        },
+        shadow = {
+            enabled      = true,
+            range        = 12,
+            render_power = 3,
+        },
+    },
+
+    animations = {
+        enabled = true,
+    },
+
+    dwindle = {
+        preserve_split      = true,
+        smart_resizing      = true,
+        force_split         = 0,
+        default_split_ratio = 1.0,
+    },
+
+    master = {
+        new_status = "master",
+    },
+
+    misc = {
+        disable_hyprland_logo    = true,
+        disable_splash_rendering = true,
+    },
+})
+
+
+---- Curvas y animaciones ----
+hl.curve("easeOutQuint",   { type = "bezier", points = { {0.23, 1},    {0.32, 1} } })
+hl.curve("easeInOutCubic", { type = "bezier", points = { {0.65, 0.05}, {0.36, 1} } })
+
+hl.animation({ leaf = "windows",    enabled = true, speed = 4, bezier = "easeOutQuint" })
+hl.animation({ leaf = "windowsOut", enabled = true, speed = 4, bezier = "easeInOutCubic", style = "popin 80%" })
+hl.animation({ leaf = "fade",       enabled = true, speed = 3, bezier = "easeOutQuint" })
+hl.animation({ leaf = "workspaces", enabled = true, speed = 3, bezier = "easeInOutCubic" })
+
+
+---------------
+---- INPUT ----
+---------------
+hl.config({
+    input = {
+        kb_layout      = "{{ .kb_layout }}",
+        kb_variant     = "{{ .kb_variant }}",
+        follow_mouse   = 1,
+        sensitivity    = 0,
+        natural_scroll = true,   -- rueda del ratón invertida
+        touchpad = {
+            natural_scroll = false,
+            -- sensitivity = -0.5,  -- descomenta para ralentizar el trackpad
+        },
+    },
+})
+
+hl.gesture({
+    fingers   = 3,
+    direction = "horizontal",
+    action    = "workspace",
+})
+
+-- Ratón USB: scroll en dirección normal (sobreescribe el global)
+hl.device({
+    name           = "logitech-g502-x-plus-1",
+    natural_scroll = false,
+})
+
+
+---------------------
+---- KEYBINDINGS ----
+---------------------
+-- IMPORTANTE: los atajos con letras usan "code:" (keycode X11 = evdev + 8),
+-- NO el carácter del layout. Así funcionan igual en Dvorak que en QWERTY,
+-- siempre en la misma posición física.
+--
+-- Tabla (posición física QWERTY -> keycode X11):
+--   Q=24  W=25  E=26  R=27  T=28  Y=29  U=30  I=31  O=32  P=33
+--   A=38  S=39  D=40  F=41  G=42  H=43  J=44  K=45  L=46
+--   Z=52  X=53  C=54  V=55  B=56  N=57  M=58
+
+local mainMod = "SUPER"
+
+---- Aplicaciones ----
+hl.bind(mainMod .. " + Return",         hl.dsp.exec_cmd(terminal))
+hl.bind(mainMod .. " + code:24",        hl.dsp.window.close())                          -- Q
+hl.bind(mainMod .. " + SHIFT + code:24", hl.dsp.window.close())                         -- Q (alias)
+hl.bind(mainMod .. " + code:26",        hl.dsp.exec_cmd(fileManager))                   -- E
+hl.bind(mainMod .. " + code:40",        hl.dsp.exec_cmd(menu))                          -- D
+hl.bind(mainMod .. " + SHIFT + code:26", hl.dsp.exit())                                 -- E
+hl.bind(mainMod .. " + code:55",        hl.dsp.window.float({ action = "toggle" }))     -- V
+hl.bind(mainMod .. " + code:41",        hl.dsp.window.fullscreen({ action = "toggle" })) -- F
+hl.bind(mainMod .. " + code:33",        hl.dsp.window.pseudo({ action = "toggle" }))    -- P
+hl.bind(mainMod .. " + code:39",        hl.dsp.layout("togglesplit"))                   -- S
+
+---- Capturas de pantalla ----
+hl.bind("Print",         hl.dsp.exec_cmd('grim -g "$(slurp)" - | wl-copy'))
+hl.bind("SHIFT + Print", hl.dsp.exec_cmd('grim ~/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png'))
+
+---- Mover el foco ----
+hl.bind(mainMod .. " + left",  hl.dsp.focus({ direction = "left" }))
+hl.bind(mainMod .. " + right", hl.dsp.focus({ direction = "right" }))
+hl.bind(mainMod .. " + up",    hl.dsp.focus({ direction = "up" }))
+hl.bind(mainMod .. " + down",  hl.dsp.focus({ direction = "down" }))
+hl.bind(mainMod .. " + code:43", hl.dsp.focus({ direction = "left" }))   -- H
+hl.bind(mainMod .. " + code:46", hl.dsp.focus({ direction = "right" }))  -- L
+hl.bind(mainMod .. " + code:45", hl.dsp.focus({ direction = "up" }))     -- K
+hl.bind(mainMod .. " + code:44", hl.dsp.focus({ direction = "down" }))   -- J
+
+---- Mover ventanas ----
+hl.bind(mainMod .. " + SHIFT + left",  hl.dsp.window.move({ direction = "left" }))
+hl.bind(mainMod .. " + SHIFT + right", hl.dsp.window.move({ direction = "right" }))
+hl.bind(mainMod .. " + SHIFT + up",    hl.dsp.window.move({ direction = "up" }))
+hl.bind(mainMod .. " + SHIFT + down",  hl.dsp.window.move({ direction = "down" }))
+hl.bind(mainMod .. " + SHIFT + code:43", hl.dsp.window.move({ direction = "left" }))   -- H
+hl.bind(mainMod .. " + SHIFT + code:46", hl.dsp.window.move({ direction = "right" }))  -- L
+hl.bind(mainMod .. " + SHIFT + code:45", hl.dsp.window.move({ direction = "up" }))     -- K
+hl.bind(mainMod .. " + SHIFT + code:44", hl.dsp.window.move({ direction = "down" }))   -- J
+
+---- Workspaces 1-10 ----
+for i = 1, 10 do
+    local key = i % 10  -- el 10 se mapea a la tecla 0
+    -- Cambiar de workspace
+    hl.bind(mainMod .. " + " .. key, hl.dsp.focus({ workspace = i }))
+    -- Mover ventana ahí Y seguirla
+    hl.bind(mainMod .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = i, follow = true }))
+    -- Mover ventana ahí SIN seguirla (la "archivas")
+    hl.bind(mainMod .. " + ALT + " .. key, hl.dsp.window.move({ workspace = i, follow = false }))
+end
+
+---- Modo resize (submap) ----
+hl.define_submap("resize", function()
+    hl.bind("right",  hl.dsp.window.resize({ x =  20, y = 0 }), { repeating = true })
+    hl.bind("left",   hl.dsp.window.resize({ x = -20, y = 0 }), { repeating = true })
+    hl.bind("up",     hl.dsp.window.resize({ x = 0, y = -20 }), { repeating = true })
+    hl.bind("down",   hl.dsp.window.resize({ x = 0, y =  20 }), { repeating = true })
+    hl.bind("Escape", hl.dsp.submap("default"))
+end)
+hl.bind(mainMod .. " + code:27", hl.dsp.submap("resize"))  -- R
+
+---- Terminal estilo Quake ----
+hl.bind(mainMod .. " + grave", hl.dsp.exec_cmd("~/.config/hypr/scripts/quake-terminal.sh"))
+
+---- Alt-Tab entre ventanas ----
+hl.bind("ALT + Tab",         hl.dsp.window.cycle_next({ next = true }))
+hl.bind("ALT + SHIFT + Tab", hl.dsp.window.cycle_next({ next = false }))
+
+---- Scroll entre workspaces ----
+hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }))
+hl.bind(mainMod .. " + mouse_up",   hl.dsp.focus({ workspace = "e-1" }))
+
+---- Mover/redimensionar con el ratón ----
+hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(),   { mouse = true })
+hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
+
+---- "xkill": Mod+Shift+clic mata la ventana bajo el cursor ----
+hl.bind(mainMod .. " + SHIFT + mouse:272", hl.dsp.window.close())
+
+---- Volumen y brillo (teclas multimedia) ----
+hl.bind("XF86AudioRaiseVolume",  hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true, repeating = true })
+hl.bind("XF86AudioLowerVolume",  hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"),      { locked = true, repeating = true })
+hl.bind("XF86AudioMute",         hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"),     { locked = true })
+hl.bind("XF86AudioMicMute",      hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"),   { locked = true })
+hl.bind("XF86MonBrightnessUp",   hl.dsp.exec_cmd("brightnessctl set 5%+"),                          { locked = true, repeating = true })
+hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl -n set 5%-"),                       { locked = true, repeating = true })
+
+---- Bloqueo y apagado ----
+hl.bind(mainMod .. " + Escape",         hl.dsp.exec_cmd(lockscreen))
+hl.bind(mainMod .. " + SHIFT + Escape", hl.dsp.exec_cmd("wlogout"))
+
+---- Grupos (stacking, estilo i3 tabbed) ----
+hl.bind(mainMod .. " + code:25",       hl.dsp.group.toggle())  -- W
+hl.bind(mainMod .. " + ALT + code:43", hl.dsp.group.prev())    -- H (anterior)
+hl.bind(mainMod .. " + ALT + code:46", hl.dsp.group.next())    -- L (siguiente)
+
+---- Scratchpad (magic workspace) ----
+hl.bind(mainMod .. " + SHIFT + code:58", hl.dsp.window.move({ workspace = "special:magic" }))  -- M
+hl.bind(mainMod .. " + code:58",         hl.dsp.workspace.toggle_special("magic"))             -- M
+hl.bind(mainMod .. " + ALT + code:58",   hl.dsp.window.move({ workspace = "+0" }))             -- M
+
+---- Último workspace usado ----
+hl.bind(mainMod .. " + Tab", hl.dsp.focus({ workspace = "previous" }))
+
+
+------------------------------
+---- REGLAS DE VENTANA ----
+------------------------------
+
+---- Terminal Quake ----
+hl.window_rule({
+    name  = "quake-term",
+    match = { class = "^(quake-term)$" },
+    float = true,
+    size  = "80% 45%",
+    move  = "10% 0%",
+    workspace = "special:quake",
+})
+
+---- Asignación de apps a workspaces ----
+-- Esquema: 1 Web · 2 Terminal/código · 3 Notas · 4 Archivos · 5 Chat
+--          6 Música · 7 Juegos · 8 Diseño · 9 Sistema · 10 Varios
+-- Para añadir más: abre la app, corre "hyprctl clients", copia el "class".
+hl.window_rule({ name = "ws-firefox", match = { class = "^(firefox)$" }, workspace = "1" })
+hl.window_rule({ name = "ws-joplin",  match = { class = "^(Joplin)$" },  workspace = "3" })
+hl.window_rule({ name = "ws-thunar",  match = { class = "^(thunar)$" },  workspace = "4" })
+hl.window_rule({ name = "ws-feishin", match = { class = "^(feishin)$" }, workspace = "6" })
+
+---- Excepciones ----
+hl.window_rule({
+    name   = "file-upload-dialog",
+    match  = { title = "^(File Upload.*)$" },
+    float  = true,
+    center = true,
+    size   = "70% 80%",
+})
+
+hl.window_rule({
+    name  = "libreoffice-tiled",
+    match = { title = "^(libreoffice.*)$" },
+    tile  = true,
+})
+
+
+---------------------------
+---- REGLAS DE CAPA ----
+---------------------------
+-- rofi/waybar/swaync son superficies layer-shell, no ventanas normales:
+-- necesitan layer_rule para el blur, no window_rule.
+hl.layer_rule({ name = "blur-rofi",       match = { namespace = "^rofi$" },   blur = true, ignore_alpha = 0.0 })
+hl.layer_rule({ name = "blur-waybar",     match = { namespace = "^waybar$" }, blur = true })
+hl.layer_rule({ name = "blur-swaync-notif",   match = { namespace = "^swaync-notification-window$" }, blur = true, ignore_alpha = 0.6 })
+hl.layer_rule({ name = "blur-swaync-control", match = { namespace = "^swaync-control-center$" },      blur = true, ignore_alpha = 0.6 })
