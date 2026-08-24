@@ -42,8 +42,23 @@ cat > "$TMP_POLICIES" << 'EOF'
 }
 EOF
 
-sudo mkdir -p /etc/firefox/policies
-sudo cp "$TMP_POLICIES" /etc/firefox/policies/policies.json
+DEST=/etc/firefox/policies/policies.json
+
+if cmp -s "$TMP_POLICIES" "$DEST" 2>/dev/null; then
+    rm -f "$TMP_POLICIES"
+    exit 0
+fi
+
+# chezmoi captura la salida de los scripts, asi que un sudo interactivo se
+# quedaria colgado con el prompt invisible y bloqueando el lock de estado.
+if ! sudo -n true 2>/dev/null; then
+    rm -f "$TMP_POLICIES"
+    echo "Hace falta sudo para escribir $DEST y aqui no se puede pedir la contrasena." >&2
+    echo "Ejecuta 'sudo -v' y repite 'chezmoi apply'." >&2
+    exit 1
+fi
+
+sudo -n install -Dm644 "$TMP_POLICIES" "$DEST"
 rm -f "$TMP_POLICIES"
 
-echo "policies.json de Firefox actualizado en /etc/firefox/policies/"
+echo "policies.json de Firefox actualizado en $DEST"
