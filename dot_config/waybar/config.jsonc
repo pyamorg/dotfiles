@@ -10,13 +10,14 @@
     "margin-left": 12,
     "margin-right": 12,
     "modules-left": [
-        "clock",
-        "custom/weather"
+        "ext/workspaces",
+        "hyprland/window"
     ],
     "modules-center": [
-        "ext/workspaces"
+        "group/clock-actions"
     ],
     "modules-right": [
+        "custom/weather",
         "custom/swaync",
         "tray",
         "cpu",
@@ -27,6 +28,78 @@
         "pulseaudio#microphone",
         "battery"
     ],
+
+    // Al pasar el ratón por el reloj se despliegan las acciones rápidas.
+    // El primer módulo del grupo es el único visible en reposo; el resto
+    // aparece deslizando hacia la derecha.
+    // El grupo NO puede llamarse "clock": su caja CSS sería #clock y
+    // chocaría con el módulo del reloj que lleva dentro.
+    "group/clock-actions": {
+        "orientation": "horizontal",
+        "drawer": {
+            "transition-duration": 350,
+            "children-class": "quick-action",
+            "transition-left-to-right": true
+        },
+        "modules": [
+            "clock",
+            "custom/screenshot",
+            "custom/screenshot-full",
+            "custom/colorpicker",
+            "custom/caffeine",
+            "custom/lock",
+            "custom/power"
+        ]
+    },
+
+    "hyprland/window": {
+        "format": "{title}",
+        "max-length": 45,
+        "separate-outputs": true,
+        "rewrite": {
+            "": "Escritorio"
+        }
+    },
+
+    "custom/screenshot": {
+        "format": "󰒅",
+        "tooltip": true,
+        "tooltip-format": "Capturar una región → portapapeles",
+        "on-click": "grim -g \"$(slurp)\" - | wl-copy"
+    },
+    "custom/screenshot-full": {
+        "format": "󰄀",
+        "tooltip": true,
+        "tooltip-format": "Capturar la pantalla entera → ~/Pictures",
+        "on-click": "grim ~/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png"
+    },
+    "custom/colorpicker": {
+        "format": "󰈊",
+        "tooltip": true,
+        "tooltip-format": "Cuentagotas de color → portapapeles",
+        "on-click": "hyprpicker -a"
+    },
+    "custom/caffeine": {
+        "format": "{}",
+        "return-type": "json",
+        "exec": "~/.config/hypr/scripts/caffeine.sh --status",
+        "interval": 30,
+        // El script hace pkill -RTMIN+8 waybar para refrescar al instante
+        "signal": 8,
+        "on-click": "~/.config/hypr/scripts/caffeine.sh"
+    },
+    "custom/lock": {
+        "format": "󰌾",
+        "tooltip": true,
+        "tooltip-format": "Bloquear la sesión",
+        "on-click": "~/.local/share/quickshell-lockscreen/lock.sh"
+    },
+    "custom/power": {
+        "format": "󰐥",
+        "tooltip": true,
+        "tooltip-format": "Apagar, reiniciar, cerrar sesión…",
+        "on-click": "wlogout -b 5"
+    },
     "clock": {
         "format": "{:%H:%M  %d/%m}",
         "tooltip-format": "<tt><small>{calendar}</small></tt>",
@@ -58,15 +131,27 @@
     // ya no parsea, y por eso los clics dejaron de cambiar de workspace.
     // El módulo ext/ activa el workspace vía protocolo Wayland, sin hyprctl.
     "ext/workspaces": {
-        "format": "{name}",
+        "format": "{icon}",
         "on-click": "activate",
         // Por nombre, no por id: Hyprland expone ids no numéricos en este
         // protocolo y "sort-by-id" los dejaba en orden de creación (1 7 4 2 9).
         "sort-by-name": true,
         "all-outputs": true,
+        // Mismo esquema que las reglas de workspace de hyprland.lua.
+        // OJO: no definir "active" aquí — sobreescribiría el icono propio
+        // del workspace activo. El estado activo se marca por CSS.
         "format-icons": {
-            "active": "",
-            "default": ""
+            "1": "󰖟",
+            "2": "󰆍",
+            "3": "󰠮",
+            "4": "󰉋",
+            "5": "󰭹",
+            "6": "󰝚",
+            "7": "󰊴",
+            "8": "󰏘",
+            "9": "󰒓",
+            "10": "󰇙",
+            "default": "󰝥"
         }
     },
     "custom/swaync": {
@@ -102,7 +187,7 @@
     },
     "network": {
         "format-wifi": " {signalStrength}%",
-        "format-ethernet": " Ethernet",
+        "format-ethernet": "󰈀 Ethernet",
         "format-disconnected": " Sin conexión",
         "tooltip-format": "{essid} | {ipaddr}/{cidr}",
         "on-click": "nm-connection-editor"

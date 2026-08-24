@@ -1,18 +1,42 @@
-/* ~/.config/waybar/style.css */
-/* Versión simple: cápsulas individuales, bien separadas, sin agrupaciones */
+/* ~/.config/waybar/style.css
+   Paleta Catppuccin Mocha, la misma que usan hyprland, swaync y wlogout.
+   Cápsulas individuales bien separadas (nada agrupado) para no
+   equivocarse de clic, salvo el reloj, que despliega acciones rápidas. */
+
+@define-color base     #1e1e2e;
+@define-color surface0 #313244;
+@define-color surface1 #45475a;
+@define-color overlay0 #6c7086;
+@define-color subtext0 #a6adc8;
+@define-color text     #cdd6f4;
+@define-color blue     #89b4fa;
+@define-color lavender #b4befe;
+@define-color sapphire #74c7ec;
+@define-color teal     #94e2d5;
+@define-color green    #a6e3a1;
+@define-color yellow   #f9e2af;
+@define-color peach    #fab387;
+@define-color red      #f38ba8;
+@define-color mauve    #cba6f7;
 
 * {
     font-family: "JetBrainsMono Nerd Font", sans-serif;
     font-size: 13px;
+    /* Quita el borde punteado que GTK pinta al enfocar por teclado */
+    border: none;
+    box-shadow: none;
 }
 
 window#waybar {
     background: transparent;
 }
 
-#clock,
+/* ---------- Cápsulas ---------- */
+
+#clock-actions,
 #custom-weather,
 #workspaces,
+#window,
 #custom-swaync,
 #tray,
 #cpu,
@@ -22,63 +46,184 @@ window#waybar {
 #pulseaudio,
 #pulseaudio-microphone,
 #battery {
-    background: rgba(24, 24, 27, 0.85);
-    border: 1px solid #3f3f46;
+    background: alpha(@base, 0.85);
+    border: 1px solid @surface1;
     border-radius: 999px;
     padding: 0 12px;
-    color: #d4d4d8;
+    color: @text;
+    transition: background 200ms ease, border-color 200ms ease, color 200ms ease;
+}
+
+/* Feedback al pasar el ratón: todos estos módulos son clicables y antes
+   no daban ninguna señal de serlo. */
+#custom-weather:hover,
+#custom-swaync:hover,
+#cpu:hover,
+#memory:hover,
+#network:hover,
+#bluetooth:hover,
+#pulseaudio:hover,
+#pulseaudio-microphone:hover,
+#battery:hover {
+    background: alpha(@surface0, 0.95);
+    border-color: @blue;
+}
+
+/* ---------- Workspaces ---------- */
+
+#workspaces {
+    padding: 0 4px;
 }
 
 #workspaces button {
-    padding: 0 6px;
-    color: #71717a;
-    font-size: 10px;
+    padding: 0 9px;
+    margin: 4px 2px;
+    border-radius: 999px;
+    color: @overlay0;
+    background: transparent;
+    font-size: 14px;
+    transition: all 200ms ease;
+}
+
+#workspaces button:hover {
+    color: @text;
+    background: alpha(@blue, 0.18);
 }
 
 #workspaces button.active {
-    color: #d4d4d8;
+    color: @base;
+    background: @blue;
 }
 
-#clock {
+#workspaces button.urgent {
+    color: @base;
+    background: @red;
+}
+
+/* ---------- Título de la ventana enfocada ---------- */
+
+#window {
+    color: @subtext0;
+    font-style: italic;
+    background: alpha(@base, 0.6);
+    border-color: @surface0;
+}
+
+/* Sin ventana enfocada: que no quede una cápsula vacía flotando */
+window#waybar.empty #window {
+    background: transparent;
+    border-color: transparent;
+    color: @overlay0;
+}
+
+/* ---------- Reloj + acciones rápidas (drawer) ---------- */
+
+#clock-actions {
+    padding: 0 4px;
+}
+
+#clock-actions:hover {
+    border-color: @lavender;
+}
+
+/* El reloj y los pills viven DENTRO de la cápsula del grupo, así que no
+   llevan fondo ni borde propios. */
+#clock-actions #clock {
+    background: transparent;
+    border: none;
+    padding: 0 10px;
     font-weight: bold;
+    color: @text;
 }
 
-#bluetooth.disabled, #bluetooth.off {
-    color: #52525b;
+/* Se listan también los ids: la clase "children-class" del drawer se aplica
+   al contenedor del módulo, no siempre al widget que pinta el padding, y sin
+   los ids los pills salían pegados unos a otros. */
+.quick-action,
+#custom-screenshot,
+#custom-screenshot-full,
+#custom-colorpicker,
+#custom-caffeine,
+#custom-lock,
+#custom-power {
+    background: transparent;
+    border: none;
+    border-radius: 999px;
+    margin: 3px 1px;
+    padding: 0 8px;
+    font-size: 15px;
+    color: @subtext0;
+    transition: all 200ms ease;
 }
 
-#battery.warning {
-    color: #c9a227;
+.quick-action:hover,
+#custom-screenshot:hover,
+#custom-screenshot-full:hover,
+#custom-colorpicker:hover,
+#custom-caffeine:hover,
+#custom-lock:hover,
+#custom-power:hover {
+    background: alpha(@lavender, 0.20);
+    color: @text;
 }
 
-#battery.critical {
-    color: #b34747;
+#custom-screenshot:hover      { color: @sapphire; }
+#custom-screenshot-full:hover { color: @sapphire; }
+#custom-colorpicker:hover     { color: @mauve; }
+#custom-lock:hover            { color: @blue; }
+#custom-power:hover           { color: @red; }
+
+#custom-caffeine.active {
+    color: @yellow;
 }
 
-#network.disconnected {
-    color: #b34747;
+/* ---------- Acentos por módulo ---------- */
+
+#custom-weather        { color: @sapphire; }
+#cpu                   { color: @peach; }
+#memory                { color: @green; }
+#network               { color: @blue; }
+#bluetooth             { color: @sapphire; }
+#pulseaudio            { color: @lavender; }
+#pulseaudio-microphone { color: @teal; }
+#battery               { color: @green; }
+#custom-swaync         { color: @yellow; }
+
+/* ---------- Estados ---------- */
+
+#bluetooth.disabled,
+#bluetooth.off {
+    color: @overlay0;
 }
+
+#battery.warning  { color: @yellow; }
+#battery.critical { color: @red; }
+#battery.charging { color: @teal; }
+#battery.plugged  { color: @green; }
+
+#network.disconnected { color: @red; }
 
 #pulseaudio.muted,
 #pulseaudio-microphone.muted {
-    color: #71717a;
+    color: @overlay0;
 }
 
+#tray menu {
+    background: @base;
+    border: 1px solid @surface1;
+    border-radius: 10px;
+    color: @text;
+}
+
+/* ---------- Tooltips ---------- */
+
 tooltip {
-    background: #18181b;
-    border: 1px solid #3f3f46;
+    background: @base;
+    border: 1px solid @surface1;
     border-radius: 10px;
 }
 
 tooltip label {
-    color: #d4d4d8;
+    color: @text;
     padding: 6px;
-}
-
-#battery.charging {
-    color: #c5a030;
-}
-
-#battery.plugged {
-    color: #a6e3a1;
 }

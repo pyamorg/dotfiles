@@ -238,7 +238,7 @@ hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl -n set 5%-"),   
 
 ---- Bloqueo y apagado ----
 hl.bind(mainMod .. " + Escape",         hl.dsp.exec_cmd(lockscreen))
-hl.bind(mainMod .. " + SHIFT + Escape", hl.dsp.exec_cmd("wlogout"))
+hl.bind(mainMod .. " + SHIFT + Escape", hl.dsp.exec_cmd("wlogout -b 5"))
 
 ---- Grupos (stacking, estilo i3 tabbed) ----
 hl.bind(mainMod .. " + code:25",       hl.dsp.group.toggle())  -- W
