@@ -14,7 +14,7 @@
         "custom/weather"
     ],
     "modules-center": [
-        "hyprland/workspaces"
+        "ext/workspaces"
     ],
     "modules-right": [
         "custom/swaync",
@@ -52,9 +52,18 @@
         "exec-if": "ping wttr.in -c1",
         "tooltip": true
     },
-    "hyprland/workspaces": {
-        "format": "{id}",
+    // Se usa "ext/workspaces" (protocolo ext-workspace-v1) y NO
+    // "hyprland/workspaces": este último manda por IPC la sintaxis vieja
+    // ("dispatch workspace 3"), que la config en Lua de Hyprland 0.55+
+    // ya no parsea, y por eso los clics dejaron de cambiar de workspace.
+    // El módulo ext/ activa el workspace vía protocolo Wayland, sin hyprctl.
+    "ext/workspaces": {
+        "format": "{name}",
         "on-click": "activate",
+        // Por nombre, no por id: Hyprland expone ids no numéricos en este
+        // protocolo y "sort-by-id" los dejaba en orden de creación (1 7 4 2 9).
+        "sort-by-name": true,
+        "all-outputs": true,
         "format-icons": {
             "active": "",
             "default": ""
