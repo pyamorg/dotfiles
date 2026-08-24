@@ -1,8 +1,7 @@
 /* ~/.config/wlogout/style.css */
 
 * {
-    background-image: none;
-    font-family: "JetBrainsMono Nerd Font", "Noto Color Emoji", sans-serif;
+    font-family: "JetBrainsMono Nerd Font", sans-serif;
 }
 
 window {
@@ -18,6 +17,14 @@ button {
     border-radius: 16px;
     margin: 10px;
     font-size: 16px;
+
+    /* Los iconos se pintan como background-image. GTK3 NO soporta
+       ::before ni la propiedad content (no es CSS web), que es como
+       estaban antes y por eso no se renderizaba ninguno. */
+    background-repeat: no-repeat;
+    background-position: center 30%;
+    background-size: 44px;
+    padding-top: 54px;
 }
 
 button:hover {
@@ -28,12 +35,16 @@ button:hover {
 button:focus {
     background-color: #89b4fa;
     color: #1e1e2e;
+    border-color: #89b4fa;
 }
 
-/* Cada botón usa un emoji como "icono" via ::before, así no
-   necesitas archivos .png/.svg sueltos */
-#lock::before     { content: "🔒"; display: block; font-size: 48px; margin-bottom: 12px; }
-#logout::before   { content: "🚪"; display: block; font-size: 48px; margin-bottom: 12px; }
-#suspend::before  { content: "😴"; display: block; font-size: 48px; margin-bottom: 12px; }
-#reboot::before   { content: "🔄"; display: block; font-size: 48px; margin-bottom: 12px; }
-#shutdown::before { content: "⏻"; display: block; font-size: 48px; margin-bottom: 12px; }
+/* PNG y no SVG a propósito: librsvg ya no instala el loader de
+   gdk-pixbuf, así que GTK no sabe rasterizar SVG. Los .svg se quedan
+   como fuente editable y se regeneran con:
+     rsvg-convert -w 128 -h 128 icono.svg -o icono.png  */
+#lock     { background-image: image(url("icons/lock.png")); }
+#logout   { background-image: image(url("icons/logout.png")); }
+#suspend  { background-image: image(url("icons/suspend.png")); }
+#reboot   { background-image: image(url("icons/reboot.png")); }
+#shutdown { background-image: image(url("icons/shutdown.png")); }
+
