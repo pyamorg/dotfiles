@@ -6,6 +6,9 @@ configuration {
     icon-theme: "Papirus";   // cambia esto al nombre de tu icon theme actual si usas otro
     display-drun: "Apps:";
     drun-display-format: "{name}";
+    // Por defecto hace falta doble clic para aceptar; con esto basta uno.
+    me-select-entry: "";
+    me-accept-entry: "MousePrimary";
 }
 
 * {

@@ -35,6 +35,7 @@ window#waybar {
 
 #clock-actions,
 #custom-weather,
+#mpris,
 #workspaces,
 #window,
 #custom-swaync,
@@ -64,9 +65,22 @@ window#waybar {
 #bluetooth:hover,
 #pulseaudio:hover,
 #pulseaudio-microphone:hover,
+#mpris:hover,
 #battery:hover {
     background: alpha(@surface0, 0.95);
     border-color: @blue;
+}
+
+/* ---------- Reproductor ---------- */
+
+#mpris {
+    margin-left: 6px;
+    color: @teal;
+}
+
+#mpris.paused {
+    color: @overlay0;
+    font-style: italic;
 }
 
 /* ---------- Workspaces ---------- */

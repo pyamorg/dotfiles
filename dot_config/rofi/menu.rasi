@@ -1,0 +1,96 @@
+/* ~/.config/rofi/menu.rasi
+   Tema para los menús desplegables de la waybar (audio, micro, wifi).
+   Se ancla arriba a la derecha, justo debajo de la barra, para que
+   parezca un popup del propio módulo. */
+
+* {
+    bg0:     #1e1e2eee;
+    bg1:     #313244;
+    fg0:     #cdd6f4;
+    fg1:     #a6adc8;
+    accent:  #89b4fa;
+
+    background-color: transparent;
+    text-color: @fg0;
+    font: "JetBrainsMono Nerd Font 11";
+}
+
+/* En Wayland rofi nunca recibe los clics de fuera de su ventana, así que
+   "click-to-exit" no hace nada: quien cierra el menú es un bind no
+   consumidor de Hyprland (ver hyprland.lua.tmpl). */
+window {
+    width: 380px;
+    location: north east;
+    anchor: north east;
+    /* margin-top(8) + height(32) + separación, y margin-right(12) */
+    x-offset: -12px;
+    y-offset: 48px;
+    background-color: @bg0;
+    border: 1px;
+    border-color: @accent;
+    border-radius: 14px;
+    padding: 12px;
+}
+
+mainbox {
+    orientation: vertical;
+    children: [ inputbar, listview, message ];
+    spacing: 10px;
+    background-color: transparent;
+}
+
+inputbar {
+    background-color: @bg1;
+    border-radius: 10px;
+    padding: 8px 12px;
+    children: [prompt, entry];
+    spacing: 8px;
+}
+
+prompt {
+    text-color: @accent;
+    font: "JetBrainsMono Nerd Font Bold 11";
+}
+
+entry {
+    placeholder: "Filtrar…";
+    placeholder-color: @fg1;
+}
+
+listview {
+    lines: 9;
+    columns: 1;
+    spacing: 2px;
+    fixed-height: false;
+    dynamic: true;
+    scrollbar: false;
+    background-color: transparent;
+    cycle: true;
+}
+
+element {
+    padding: 7px 10px;
+    border-radius: 8px;
+    background-color: transparent;
+}
+
+element selected {
+    background-color: @accent;
+    text-color: #1e1e2e;
+}
+
+element-text {
+    vertical-align: 0.5;
+    background-color: transparent;
+    text-color: inherit;
+}
+
+message {
+    background-color: @bg1;
+    border-radius: 10px;
+    padding: 8px 12px;
+}
+
+textbox {
+    text-color: @fg1;
+}
