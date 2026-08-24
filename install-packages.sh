@@ -19,6 +19,17 @@ sudo pacman -S --needed --noconfirm \
     qt6-declarative qt6-5compat qt6-multimedia qt6-multimedia-ffmpeg \
     gst-plugins-base gst-plugins-good gst-plugins-bad gst-plugins-ugly fzf
 
+# Dependencias que invocan directamente los dotfiles (waybar, hyprland,
+# hypridle y los scripts de ~/.config/hypr/scripts).
+echo "--> Dependencias de la barra y los atajos..."
+sudo pacman -S --needed --noconfirm \
+    waybar jq \
+    grim slurp wl-clipboard hyprpicker \
+    hypridle hyprlock hyprpaper \
+    brightnessctl \
+    network-manager-applet blueman pavucontrol \
+    ttf-jetbrains-mono-nerd
+
 echo "--> Paquetes AUR personales..."
 yay -S --needed --noconfirm wlogout quickshell
 
