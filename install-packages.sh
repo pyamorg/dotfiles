@@ -28,6 +28,7 @@ sudo pacman -S --needed --noconfirm \
     hypridle hyprlock hyprpaper \
     brightnessctl \
     network-manager-applet blueman pavucontrol \
+    cliphist \
     ttf-jetbrains-mono-nerd
 
 echo "--> Paquetes AUR personales..."
@@ -53,6 +54,14 @@ echo "--> Configurando auto-desbloqueo de gnome-keyring con SDDM..."
 if ! grep -q pam_gnome_keyring /etc/pam.d/sddm 2>/dev/null; then
     sudo sed -i '/^auth.*include.*system-login/a auth       optional     pam_gnome_keyring.so' /etc/pam.d/sddm
     sudo sed -i '/^session.*include.*system-login/a session    optional     pam_gnome_keyring.so auto_start' /etc/pam.d/sddm
+fi
+
+echo "--> Permisos de los knobs del LG Gram (tope de carga, ventilador)..."
+rules="$(dirname "$0")/system/99-lg-laptop.rules"
+if [ -e /sys/devices/platform/lg-laptop ] && [ -f "$rules" ]; then
+    sudo install -m 644 "$rules" /etc/udev/rules.d/99-lg-laptop.rules
+    sudo udevadm control --reload
+    sudo udevadm trigger --subsystem-match=platform
 fi
 
 echo "--> Preferencia de modo oscuro (dconf, necesita sesión real)..."

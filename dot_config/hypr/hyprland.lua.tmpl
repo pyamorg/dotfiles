@@ -30,6 +30,9 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("hyprpaper")
     hl.exec_cmd("swaync")
     hl.exec_cmd("hypridle")
+    -- Vigilantes del portapapeles: alimentan el historial de cliphist.
+    hl.exec_cmd("wl-paste --type text --watch cliphist store")
+    hl.exec_cmd("wl-paste --type image --watch cliphist store")
     -- Descomenta si prefieres KWallet en vez de gnome-keyring:
     -- hl.exec_cmd("/usr/lib/kwalletd6")
 end)
@@ -158,6 +161,8 @@ hl.bind(mainMod .. " + code:24",        hl.dsp.window.close())                  
 hl.bind(mainMod .. " + SHIFT + code:24", hl.dsp.window.close())                         -- Q (alias)
 hl.bind(mainMod .. " + code:26",        hl.dsp.exec_cmd(fileManager))                   -- E
 hl.bind(mainMod .. " + code:40",        hl.dsp.exec_cmd(menu))                          -- D
+hl.bind(mainMod .. " + code:54",        hl.dsp.exec_cmd("~/.config/hypr/scripts/control-center.sh"))       -- C
+hl.bind(mainMod .. " + SHIFT + code:60", hl.dsp.exec_cmd("~/.config/hypr/scripts/clipboard-menu.sh"))      -- . (V en Dvorak)
 hl.bind(mainMod .. " + SHIFT + code:26", hl.dsp.exit())                                 -- E
 hl.bind(mainMod .. " + code:55",        hl.dsp.window.float({ action = "toggle" }))     -- V
 hl.bind(mainMod .. " + code:41",        hl.dsp.window.fullscreen({ action = "toggle" })) -- F

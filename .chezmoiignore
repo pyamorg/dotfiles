@@ -3,3 +3,6 @@
 # install-packages.sh lo ejecuta el instalador genérico desde la raíz del
 # repo (después de "chezmoi apply"), así que no pinta nada en el home.
 install-packages.sh
+
+# Ficheros de sistema (/etc): los instala install-packages.sh con sudo.
+system

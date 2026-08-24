@@ -35,14 +35,14 @@ window#waybar {
 
 #clock-actions,
 #custom-weather,
-#mpris,
+#custom-music,
 #workspaces,
 #window,
 #custom-swaync,
 #tray,
 #cpu,
 #memory,
-#network,
+#custom-network,
 #bluetooth,
 #pulseaudio,
 #pulseaudio-microphone,
@@ -61,11 +61,11 @@ window#waybar {
 #custom-swaync:hover,
 #cpu:hover,
 #memory:hover,
-#network:hover,
+#custom-network:hover,
 #bluetooth:hover,
 #pulseaudio:hover,
 #pulseaudio-microphone:hover,
-#mpris:hover,
+#custom-music:hover,
 #battery:hover {
     background: alpha(@surface0, 0.95);
     border-color: @blue;
@@ -73,12 +73,12 @@ window#waybar {
 
 /* ---------- Reproductor ---------- */
 
-#mpris {
+#custom-music {
     margin-left: 6px;
     color: @teal;
 }
 
-#mpris.paused {
+#custom-music.paused {
     color: @overlay0;
     font-style: italic;
 }
@@ -158,6 +158,7 @@ window#waybar.empty #window {
 #custom-screenshot-full,
 #custom-colorpicker,
 #custom-caffeine,
+#custom-dnd,
 #custom-lock,
 #custom-power {
     background: transparent;
@@ -175,6 +176,7 @@ window#waybar.empty #window {
 #custom-screenshot-full:hover,
 #custom-colorpicker:hover,
 #custom-caffeine:hover,
+#custom-dnd:hover,
 #custom-lock:hover,
 #custom-power:hover {
     background: alpha(@lavender, 0.20);
@@ -185,10 +187,15 @@ window#waybar.empty #window {
 #custom-screenshot-full:hover { color: @sapphire; }
 #custom-colorpicker:hover     { color: @mauve; }
 #custom-lock:hover            { color: @blue; }
+#custom-dnd:hover             { color: @peach; }
 #custom-power:hover           { color: @red; }
 
 #custom-caffeine.active {
     color: @yellow;
+}
+
+#custom-dnd.active {
+    color: @peach;
 }
 
 /* ---------- Acentos por módulo ---------- */
@@ -196,7 +203,7 @@ window#waybar.empty #window {
 #custom-weather        { color: @sapphire; }
 #cpu                   { color: @peach; }
 #memory                { color: @green; }
-#network               { color: @blue; }
+#custom-network        { color: @blue; }
 #bluetooth             { color: @sapphire; }
 #pulseaudio            { color: @lavender; }
 #pulseaudio-microphone { color: @teal; }
@@ -215,7 +222,8 @@ window#waybar.empty #window {
 #battery.charging { color: @teal; }
 #battery.plugged  { color: @green; }
 
-#network.disconnected { color: @red; }
+/* Con la VPN levantada el icono lleva candado y cambia de color. */
+#custom-network.vpn { color: @green; }
 
 #pulseaudio.muted,
 #pulseaudio-microphone.muted {

@@ -12,7 +12,7 @@
     "modules-left": [
         "ext/workspaces",
         "hyprland/window",
-        "mpris"
+        "custom/music"
     ],
     "modules-center": [
         "group/clock-actions"
@@ -23,7 +23,7 @@
         "tray",
         "cpu",
         "memory",
-        "network",
+        "custom/network",
         "bluetooth",
         "pulseaudio",
         "pulseaudio#microphone",
@@ -48,6 +48,7 @@
             "custom/screenshot-full",
             "custom/colorpicker",
             "custom/caffeine",
+            "custom/dnd",
             "custom/lock",
             "custom/power"
         ]
@@ -89,6 +90,14 @@
         "signal": 8,
         "on-click": "~/.config/hypr/scripts/caffeine.sh"
     },
+    "custom/dnd": {
+        "format": "{}",
+        "return-type": "json",
+        "exec": "~/.config/hypr/scripts/dnd.sh --status",
+        "interval": 30,
+        "signal": 10,
+        "on-click": "~/.config/hypr/scripts/dnd.sh"
+    },
     "custom/lock": {
         "format": "󰌾",
         "tooltip": true,
@@ -101,30 +110,18 @@
         "tooltip-format": "Apagar, reiniciar, cerrar sesión…",
         "on-click": "wlogout -b 5"
     },
-    // Solo aparece cuando hay un reproductor activo; waybar oculta el
-    // módulo mpris si no hay ninguno.
-    "mpris": {
-        "format": "{player_icon}  {dynamic}",
-        "format-paused": "{status_icon}  {dynamic}",
-        "dynamic-order": [
-            "title",
-            "artist"
-        ],
-        "dynamic-separator": "  ·  ",
-        "dynamic-len": 40,
-        "interval": 1,
-        "player-icons": {
-            "default": "󰀊"
-        },
-        "status-icons": {
-            "paused": "󰏄"
-        },
+    // Cápsula del reproductor: se esconde sola tras 5 minutos en pausa.
+    "custom/music": {
+        "format": "{}",
+        "return-type": "json",
+        "exec": "~/.config/hypr/scripts/music.sh",
+        "interval": 2,
+        "escape": true,
         "on-click": "playerctl play-pause",
         "on-click-right": "playerctl next",
         "on-click-middle": "playerctl previous",
         "on-scroll-up": "playerctl position 5+",
-        "on-scroll-down": "playerctl position 5-",
-        "tooltip-format": "{title}\n{artist} — {album}"
+        "on-scroll-down": "playerctl position 5-"
     },
     "clock": {
         "format": "{:%H:%M  %d/%m}",
@@ -213,14 +210,17 @@
         "on-click": "~/.config/hypr/scripts/proc-menu.sh mem",
         "on-click-middle": "kitty -e btop"
     },
-    "network": {
-        "format-wifi": " {signalStrength}%",
-        "format-ethernet": "󰈀 Ethernet",
-        "format-disconnected": " Sin conexión",
-        "tooltip-format": "{essid} | {ipaddr}/{cidr}",
-        // Menú de redes al alcance, anclado bajo el módulo (rofi).
+    // Reemplaza al módulo "network" nativo: este sí sabe de la VPN.
+    "custom/network": {
+        "format": "{}",
+        "return-type": "json",
+        "exec": "~/.config/hypr/scripts/net-status.sh",
+        "interval": 5,
+        "signal": 9,
+        // Menú de redes y VPN al alcance, anclado bajo el módulo (rofi).
         "on-click": "~/.config/hypr/scripts/wifi-menu.sh",
-        "on-click-right": "nm-connection-editor"
+        "on-click-middle": "~/.config/hypr/scripts/wifi-menu.sh",
+        "on-click-right": "~/.config/hypr/scripts/net-status.sh --toggle"
     },
     "bluetooth": {
         "format": "",

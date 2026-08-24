@@ -1,0 +1,5 @@
+# LG Gram: los knobs del modulo lg_laptop son root:root por defecto. Con esto
+# el grupo wheel puede cambiarlos sin sudo (lo usa power-menu.sh).
+#   sudo install -m 644 ~/.local/share/chezmoi/system/99-lg-laptop.rules /etc/udev/rules.d/
+#   sudo udevadm control --reload && sudo udevadm trigger --subsystem-match=platform
+ACTION=="add|change", SUBSYSTEM=="platform", KERNEL=="lg-laptop", RUN+="/bin/sh -c 'chgrp wheel /sys%p/battery_care_limit /sys%p/fan_mode; chmod 0664 /sys%p/battery_care_limit /sys%p/fan_mode'"

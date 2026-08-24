@@ -81,6 +81,7 @@ __rescan__)
     ;;
 __toggle__)
     [[ $radio == "enabled" ]] && nmcli radio wifi off || nmcli radio wifi on
+    pkill -RTMIN+9 waybar 2>/dev/null || true
     exit 0
     ;;
 __editor__)
@@ -108,6 +109,7 @@ if nmcli -t -f NAME connection show | sed 's/\\:/:/g' | grep -qxF "$selected"; t
     else
         notify-send -a waybar -u critical -i network-error "Wifi" "No se pudo conectar a $selected"
     fi
+    pkill -RTMIN+9 waybar 2>/dev/null || true
     exit 0
 fi
 
@@ -129,3 +131,4 @@ if [[ $result == *successfully* ]]; then
 else
     notify-send -a waybar -u critical -i network-error "Wifi" "$result"
 fi
+pkill -RTMIN+9 waybar 2>/dev/null || true
