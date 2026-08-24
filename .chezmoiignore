@@ -3,7 +3,3 @@
 # install-packages.sh lo ejecuta el instalador genérico desde la raíz del
 # repo (después de "chezmoi apply"), así que no pinta nada en el home.
 install-packages.sh
-
-# La config vieja en hyprlang se conserva en el repo como referencia,
-# pero no pinta nada en ~/.config/hypr (ahí manda hyprland.lua).
-.config/hypr/hyprland.conf.old
