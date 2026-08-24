@@ -141,11 +141,11 @@
         // OJO: no definir "active" aquí — sobreescribiría el icono propio
         // del workspace activo. El estado activo se marca por CSS.
         "format-icons": {
-            "1": "󰖟",
-            "2": "󰆍",
-            "3": "󰠮",
+            "1": "󰈹",
+            "2": "󰨞",
+            "3": "󰭹",
             "4": "󰉋",
-            "5": "󰭹",
+            "5": "󰠮",
             "6": "󰝚",
             "7": "󰊴",
             "8": "󰏘",
