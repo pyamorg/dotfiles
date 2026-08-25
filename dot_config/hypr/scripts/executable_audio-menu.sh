@@ -2,6 +2,7 @@
 # Selector de dispositivo de audio para la waybar.
 #   audio-menu.sh output   -> altavoces / salida
 #   audio-menu.sh input    -> micrófono / entrada
+# El volumen no está aquí: es el slider que se despliega al pasar el ratón.
 # Cambia el dispositivo por defecto y mueve además los flujos que ya
 # estaban sonando, que si no se quedan en el dispositivo anterior.
 set -euo pipefail
@@ -37,7 +38,7 @@ mapfile -t devices < <(
 )
 
 [[ ${#devices[@]} -eq 0 ]] && {
-    notify-send "Audio" "No hay dispositivos disponibles"
+    notify-send -a waybar "Audio" "No hay dispositivos disponibles"
     exit 0
 }
 
@@ -73,5 +74,4 @@ while read -r id _; do
     [[ -n $id ]] && pactl "$move" "$id" "$selected" 2>/dev/null || true
 done < <(pactl list short "$streams")
 
-desc=${devices[$choice]#*$'\t'}
-notify-send -a waybar -i audio-card "$prompt" "$desc"
+notify-send -a waybar -i audio-card "$prompt" "${devices[$choice]#*$'\t'}"

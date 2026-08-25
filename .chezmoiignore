@@ -6,3 +6,6 @@ install-packages.sh
 
 # Ficheros de sistema (/etc): los instala install-packages.sh con sudo.
 system
+
+# Documentación del repo.
+AGENTS.md

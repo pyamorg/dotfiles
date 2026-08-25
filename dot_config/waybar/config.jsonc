@@ -25,9 +25,9 @@
         "memory",
         "custom/network",
         "bluetooth",
-        "pulseaudio",
+        "group/audio",
         "pulseaudio#microphone",
-        "battery"
+        "group/power"
     ],
 
     // Al pasar el ratón por el reloj se despliegan las acciones rápidas.
@@ -52,6 +52,47 @@
             "custom/lock",
             "custom/power"
         ]
+    },
+
+    // Al pasar el ratón por el volumen o por la batería se despliega el
+    // slider correspondiente hacia la izquierda.
+    "group/audio": {
+        "orientation": "horizontal",
+        "drawer": {
+            "transition-duration": 350,
+            "children-class": "slider-action",
+            "transition-left-to-right": false
+        },
+        "modules": [
+            "pulseaudio",
+            "pulseaudio/slider"
+        ]
+    },
+
+    "pulseaudio/slider": {
+        "min": 0,
+        "max": 100,
+        "orientation": "horizontal"
+    },
+
+    "group/power": {
+        "orientation": "horizontal",
+        "drawer": {
+            "transition-duration": 350,
+            "children-class": "slider-action",
+            "transition-left-to-right": false
+        },
+        "modules": [
+            "battery",
+            "backlight/slider"
+        ]
+    },
+
+    // min 1: a 0 la pantalla se queda negra y no hay forma de volver.
+    "backlight/slider": {
+        "min": 1,
+        "max": 100,
+        "orientation": "horizontal"
     },
 
     "hyprland/window": {

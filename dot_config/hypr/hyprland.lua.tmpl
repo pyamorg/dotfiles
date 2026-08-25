@@ -33,6 +33,8 @@ hl.on("hyprland.start", function()
     -- Vigilantes del portapapeles: alimentan el historial de cliphist.
     hl.exec_cmd("wl-paste --type text --watch cliphist store")
     hl.exec_cmd("wl-paste --type image --watch cliphist store")
+    -- Baja el brillo y avisa cuando la batería llega al 15%.
+    hl.exec_cmd(os.getenv("HOME") .. "/.config/hypr/scripts/battery-watch.sh")
     -- Descomenta si prefieres KWallet en vez de gnome-keyring:
     -- hl.exec_cmd("/usr/lib/kwalletd6")
 end)

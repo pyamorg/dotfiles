@@ -46,6 +46,8 @@ window#waybar {
 #bluetooth,
 #pulseaudio,
 #pulseaudio-microphone,
+#audio,
+#power,
 #battery {
     background: alpha(@base, 0.85);
     border: 1px solid @surface1;
@@ -66,6 +68,8 @@ window#waybar {
 #pulseaudio:hover,
 #pulseaudio-microphone:hover,
 #custom-music:hover,
+#audio:hover,
+#power:hover,
 #battery:hover {
     background: alpha(@surface0, 0.95);
     border-color: @blue;
@@ -130,8 +134,58 @@ window#waybar.empty #window {
     color: @overlay0;
 }
 
-/* ---------- Reloj + acciones rápidas (drawer) ---------- */
+/* ---------- Sliders desplegables (volumen y brillo) ---------- */
 
+#audio,
+#power {
+    padding: 0 4px;
+}
+
+#audio:hover,
+#power:hover {
+    border-color: @lavender;
+}
+
+/* Los módulos van dentro de la cápsula del grupo: sin fondo ni borde. */
+#audio #pulseaudio,
+#power #battery {
+    background: transparent;
+    border: none;
+    padding: 0 8px;
+}
+
+#pulseaudio-slider,
+#backlight-slider {
+    min-width: 110px;
+    margin: 0 8px 0 4px;
+}
+
+#pulseaudio-slider trough,
+#backlight-slider trough {
+    min-height: 6px;
+    border-radius: 999px;
+    background: @surface1;
+}
+
+#pulseaudio-slider highlight {
+    border-radius: 999px;
+    background: @sky;
+}
+
+#backlight-slider highlight {
+    border-radius: 999px;
+    background: @yellow;
+}
+
+#pulseaudio-slider slider,
+#backlight-slider slider {
+    min-width: 12px;
+    min-height: 12px;
+    border-radius: 999px;
+    background: @text;
+}
+
+/* ---------- Reloj + acciones rápidas (drawer) ---------- */
 #clock-actions {
     padding: 0 4px;
 }
