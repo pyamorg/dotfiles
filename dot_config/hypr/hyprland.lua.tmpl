@@ -308,6 +308,17 @@ for ws, classes in pairs(ws_apps) do
 end
 
 ---- Comportamiento por workspace ----
+-- Nombres con dos dígitos ("01".."10"). El módulo ext/workspaces de waybar
+-- solo ordena numéricamente si TODOS los nombres son dígitos, y el scratchpad
+-- ("special:quake") lo impide: cae a orden alfabético y el 10 acababa entre
+-- el 1 y el 2. Con el cero delante el orden alfabético ya es el numérico.
+for i = 1, 10 do
+    hl.workspace_rule({
+        workspace    = tostring(i),
+        default_name = string.format("%02d", i),
+    })
+end
+
 -- 1-3 persistentes para que la barra no "baile" al cerrar la última ventana.
 hl.workspace_rule({ workspace = "1", persistent = true })
 hl.workspace_rule({ workspace = "3", persistent = true })
