@@ -5,12 +5,14 @@ Los datos salen de wttr.in (formato j1, descripciones en español). La
 respuesta se guarda en caché: si la red falla se pinta lo último bueno en
 vez de dejar el hueco vacío.
 
-La ubicación sale de ~/.config/hypr/weather-city (o de $WEATHER_CITY). Si el
-fichero está vacío o pone "auto", wttr.in geolocaliza por IP.
+La ubicación sale de ~/.config/hypr/weather-city (o de $WEATHER_CITY). Ese
+fichero lo crea chezmoi vacío y luego no lo vuelve a tocar (prefijo
+"create_"), y vacío significa que wttr.in geolocaliza por IP.
 
   (nada)    JSON para la cápsula "custom/weather" de waybar
   --tooltip imprime solo el tooltip (para verlo con pango-view)
   --city    pregunta la ubicación por rofi y la guarda
+  --place   imprime la ubicación configurada (vacía si es por IP)
 """
 
 import html
@@ -26,7 +28,12 @@ from urllib.parse import quote
 import requests
 
 CITY_FILE = Path.home() / ".config/hypr/weather-city"
-DEFAULT_CITY = "Madrid"
+CITY_HEADER = (
+    "# Ubicación del widget del tiempo (Weather.py).\n"
+    "# Una línea con la ciudad, el código postal o las coordenadas.\n"
+    "# Sin nada = wttr.in geolocaliza por IP. "
+    "Se cambia con clic derecho en la cápsula.\n"
+)
 LANG = "es"
 CACHE = Path(os.environ.get("XDG_RUNTIME_DIR") or "/tmp") / "waybar-weather.json"
 CACHE_TTL = 900
@@ -157,9 +164,10 @@ def city():
     valor = os.environ.get("WEATHER_CITY")
     if valor is None:
         try:
-            valor = CITY_FILE.read_text()
+            lineas = [l.strip() for l in CITY_FILE.read_text().splitlines()]
         except OSError:
-            valor = DEFAULT_CITY
+            lineas = []
+        valor = next((l for l in lineas if l and not l.startswith("#")), "")
     valor = valor.strip()
     return "" if valor.lower() in ("", "auto", "ip") else valor
 
@@ -329,7 +337,7 @@ def set_city():
         except (requests.RequestException, ValueError):
             notify("Ubicación no válida", f"wttr.in no encuentra «{nueva}»", True)
             return
-    CITY_FILE.write_text(destino + "\n")
+    CITY_FILE.write_text(CITY_HEADER + destino + "\n")
     CACHE.unlink(missing_ok=True)
     subprocess.run(["pkill", f"-RTMIN+{WAYBAR_SIGNAL}", "waybar"], check=False)
     notify("El tiempo", f"Ubicación: {destino or 'automática por IP'}")
@@ -344,6 +352,9 @@ def notify(title, body="", error=False):
 def main():
     if "--city" in sys.argv:
         set_city()
+        return
+    if "--place" in sys.argv:
+        print(city())
         return
     data, age = fetch()
     if "--tooltip" in sys.argv:

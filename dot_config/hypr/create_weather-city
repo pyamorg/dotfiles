@@ -1,0 +1,3 @@
+# Ubicación del widget del tiempo (Weather.py).
+# Una línea con la ciudad, el código postal o las coordenadas.
+# Sin nada = wttr.in geolocaliza por IP. Se cambia con clic derecho en la cápsula.
