@@ -1,14 +1,14 @@
-/* ~/.config/rofi/menu.rasi
+/* ~/.config/rofi/menu.rasi — generado por chezmoi desde .chezmoidata/colors.yaml
    Tema para los menús desplegables de la waybar (audio, micro, wifi).
    Se ancla arriba a la derecha, justo debajo de la barra, para que
    parezca un popup del propio módulo. */
 
 * {
-    bg0:     #1e1e2eee;
-    bg1:     #313244;
-    fg0:     #cdd6f4;
-    fg1:     #a6adc8;
-    accent:  #89b4fa;
+    bg0:     {{ .colors.base }}ee;
+    bg1:     {{ .colors.surface0 }};
+    fg0:     {{ .colors.text }};
+    fg1:     {{ .colors.subtext0 }};
+    accent:  {{ .colors.accent }};
 
     background-color: transparent;
     text-color: @fg0;

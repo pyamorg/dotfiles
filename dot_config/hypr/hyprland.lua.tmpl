@@ -60,8 +60,8 @@ hl.config({
         gaps_out = 8,
         border_size = 2,
         col = {
-            active_border   = { colors = { "rgba(89b4faee)", "rgba(cba6f7ee)" }, angle = 45 },
-            inactive_border = "rgba(595959aa)",
+            active_border   = { colors = { "rgba({{ trimPrefix "#" .colors.accent }}ee)", "rgba({{ trimPrefix "#" .colors.accent2 }}ee)" }, angle = 45 },
+            inactive_border = "rgba({{ trimPrefix "#" .colors.surface1 }}aa)",
         },
         resize_on_border = true,
         layout = "dwindle",
@@ -405,3 +405,6 @@ end
 for _, button in ipairs({ "mouse:272", "mouse:273", "mouse:274" }) do
     hl.bind(button, close_rofi_on_outside_click, { mouse = true, non_consuming = true })
 end
+
+-- HyprMod managed settings
+require("hyprland-gui")

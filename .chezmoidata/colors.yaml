@@ -1,0 +1,44 @@
+# .chezmoidata/colors.yaml
+#
+# Paleta única de todo el escritorio. chezmoi la expone como {{ .colors.X }}
+# en cualquier plantilla del repo, así que un cambio aquí se propaga a
+# waybar, rofi, swaync, wlogout, kitty, hyprland y hyprlock con un
+# "chezmoi apply".
+#
+# GENERADO POR ./theme.sh — no lo edites a mano salvo que quieras un tema
+# fijo; la próxima ejecución del script lo sobrescribe.
+#
+# Los nombres son ROLES, no colores literales: "accent" es el acento
+# principal aunque acabe siendo verde. Los semánticos (red/yellow/green)
+# conservan su significado pase lo que pase con el fondo.
+
+theme:
+  source: "/home/pyam/Pictures/wallpapers/fondo.jpg"
+  mode: "dark"
+
+colors:
+  # --- Neutros, de más oscuro a más claro. Llevan el tono del fondo. ---
+  crust: "#0c0d13"
+  mantle: "#12131c"
+  base: "#181a25"
+  surface0: "#2b2d3b"
+  surface1: "#3d4151"
+  surface2: "#515467"
+  overlay0: "#71768e"
+  subtext0: "#b1b5c9"
+  text: "#d9dbe8"
+
+  # --- Acentos derivados del color dominante del fondo. ---
+  accent: "#8495f0"
+  accent2: "#cc91ed"
+  accent3: "#b0a6ed"
+
+  # --- Semánticos: tono fijo, luminosidad normalizada. ---
+  red: "#f38ca9"
+  peach: "#fab285"
+  yellow: "#f9e1ae"
+  green: "#a6e3a1"
+  teal: "#93e1d4"
+  sky: "#89dceb"
+  sapphire: "#74c6ec"
+  pink: "#f5c2e7"
