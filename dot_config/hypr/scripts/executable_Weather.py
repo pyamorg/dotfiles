@@ -5,27 +5,36 @@ Los datos salen de wttr.in (formato j1, descripciones en español). La
 respuesta se guarda en caché: si la red falla se pinta lo último bueno en
 vez de dejar el hueco vacío.
 
+La ubicación sale de ~/.config/hypr/weather-city (o de $WEATHER_CITY). Si el
+fichero está vacío o pone "auto", wttr.in geolocaliza por IP.
+
   (nada)    JSON para la cápsula "custom/weather" de waybar
   --tooltip imprime solo el tooltip (para verlo con pango-view)
+  --city    pregunta la ubicación por rofi y la guarda
 """
 
 import html
 import json
 import os
+import subprocess
 import sys
 import time
 from datetime import datetime
 from pathlib import Path
+from urllib.parse import quote
 
 import requests
 
-CITY = "Madrid"
+CITY_FILE = Path.home() / ".config/hypr/weather-city"
+DEFAULT_CITY = "Madrid"
 LANG = "es"
 CACHE = Path(os.environ.get("XDG_RUNTIME_DIR") or "/tmp") / "waybar-weather.json"
 CACHE_TTL = 900
 TIMEOUT = 8
 DAYS = 3
 HOUR_STEP = 3
+WAYBAR_SIGNAL = 12
+THEME = Path.home() / ".config/rofi/menu.rasi"
 
 # Iconos nf-md escritos como escapes: al pegar glifos directamente se cuelan
 # bytes de reemplazo con demasiada facilidad.
@@ -143,22 +152,42 @@ def span(text, color=None, weight=None, size=None, escape=True):
 # Datos
 # --------------------------------------------------------------------------
 
+def city():
+    """Ubicación configurada; cadena vacía = que wttr.in tire de la IP."""
+    valor = os.environ.get("WEATHER_CITY")
+    if valor is None:
+        try:
+            valor = CITY_FILE.read_text()
+        except OSError:
+            valor = DEFAULT_CITY
+    valor = valor.strip()
+    return "" if valor.lower() in ("", "auto", "ip") else valor
+
+
+def download(place):
+    resp = requests.get(f"https://wttr.in/{quote(place)}?format=j1&lang={LANG}",
+                        timeout=TIMEOUT, headers={"User-Agent": "curl/8"})
+    resp.raise_for_status()
+    return resp.json()
+
+
 def fetch():
     """Devuelve (datos, edad en segundos). Cae a la caché si no hay red."""
+    place = city()
     cached = None
     if CACHE.exists():
         try:
             cached = json.loads(CACHE.read_text())
         except ValueError:
             cached = None
+        # Un cambio de ubicación invalida la caché aunque siga fresca.
+        if cached and cached.get("city") != place:
+            cached = None
         if cached and time.time() - cached["ts"] < CACHE_TTL:
             return cached["data"], time.time() - cached["ts"]
     try:
-        resp = requests.get(f"https://wttr.in/{CITY}?format=j1&lang={LANG}",
-                            timeout=TIMEOUT, headers={"User-Agent": "curl/8"})
-        resp.raise_for_status()
-        data = resp.json()
-        CACHE.write_text(json.dumps({"ts": time.time(), "data": data}))
+        data = download(place)
+        CACHE.write_text(json.dumps({"ts": time.time(), "city": place, "data": data}))
         return data, 0
     except (requests.RequestException, ValueError, OSError):
         if cached:
@@ -173,6 +202,14 @@ def desc(node):
         if value:
             return value[0]["value"].strip()
     return ""
+
+
+def place_name(data):
+    """El sitio que wttr.in dice haber resuelto, no lo que pidió el usuario."""
+    try:
+        return data["nearest_area"][0]["areaName"][0]["value"].strip()
+    except (KeyError, IndexError, TypeError):
+        return city() or "por IP"
 
 
 def day_label(index, iso):
@@ -198,7 +235,7 @@ def build_tooltip(data, age):
     temp, feels = int(cur["temp_C"]), int(cur["FeelsLikeC"])
 
     lineas = [
-        f"{span(I_PIN, C_ACCENT, escape=False)} {span(CITY, C_TEXT, weight='bold')}"
+        f"{span(I_PIN, C_ACCENT, escape=False)} {span(place_name(data), C_TEXT, weight='bold')}"
         f"  {span(now.strftime('%H:%M'), C_MUTED)}",
         f"{span(icon, temp_color(temp), size='xx-large', escape=False)}  "
         f"{span(f'{temp}°', C_TEXT, size='xx-large')}"
@@ -271,7 +308,43 @@ def build_status(data, age):
     }
 
 
+def set_city():
+    """Pregunta la ubicación por rofi, la comprueba y la guarda."""
+    actual = city()
+    mesg = ("Ciudad, código postal o coordenadas. "
+            "Vacío o <b>auto</b> para localizar por IP.")
+    proc = subprocess.run(
+        ["rofi", "-dmenu", "-i", "-markup-rows", "-theme", str(THEME),
+         "-theme-str", "window { width: 480px; location: north; anchor: north; }"
+                       "listview { enabled: false; }",
+         "-p", "\U000f034e  Ubicación", "-mesg", mesg, "-filter", actual],
+        input="", text=True, capture_output=True)
+    if proc.returncode != 0:
+        return
+    nueva = proc.stdout.strip()
+    destino = "" if nueva.lower() in ("", "auto", "ip") else nueva
+    if destino:
+        try:
+            download(destino)
+        except (requests.RequestException, ValueError):
+            notify("Ubicación no válida", f"wttr.in no encuentra «{nueva}»", True)
+            return
+    CITY_FILE.write_text(destino + "\n")
+    CACHE.unlink(missing_ok=True)
+    subprocess.run(["pkill", f"-RTMIN+{WAYBAR_SIGNAL}", "waybar"], check=False)
+    notify("El tiempo", f"Ubicación: {destino or 'automática por IP'}")
+
+
+def notify(title, body="", error=False):
+    subprocess.run(["notify-send", "-a", "waybar",
+                    "-i", "dialog-error" if error else "weather-few-clouds",
+                    title, body], check=False)
+
+
 def main():
+    if "--city" in sys.argv:
+        set_city()
+        return
     data, age = fetch()
     if "--tooltip" in sys.argv:
         print(build_tooltip(data, age) if data else "Sin datos")

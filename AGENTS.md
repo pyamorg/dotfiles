@@ -171,7 +171,7 @@ normal y `-i dialog-error`.
 | `proc-menu.sh` | `cpu`/`mem`: top 12, Enter mata el proceso |
 | `music.sh` | Reproductor; esconde la cápsula tras 5 min en pausa |
 | `calendar-menu.py` | Agenda de los calendarios CalDAV (evolution-data-server): reloj de la barra (`--clock`) con rejilla mensual en el tooltip, cápsula del próximo evento, menú con detalle, alta rápida en español, borrado y visibilidad de calendarios |
-| `Weather.py` | Tiempo de wttr.in (j1, `lang=es`) con caché de 15 min: icono según cielo/día-noche y tooltip con detalles y previsión de 3 días. `--tooltip` lo imprime suelto |
+| `Weather.py` | Tiempo de wttr.in (j1, `lang=es`) con caché de 15 min: icono según cielo/día-noche y tooltip con detalles y previsión de 3 días. La ubicación vive en `~/.config/hypr/weather-city` (vacío o `auto` = por IP) y se cambia con `--city`; `--tooltip` lo imprime suelto |
 | `dnd.sh` | Silencio de notificaciones (swaync) |
 | `clipboard-menu.sh` | Historial de cliphist |
 | `control-center.sh` | Menú raíz con todo lo anterior (Super+C) |

@@ -202,7 +202,8 @@
         "escape": false,
         "tooltip": true,
         "on-click": "rm -f \"${XDG_RUNTIME_DIR:-/tmp}/waybar-weather.json\"; pkill -RTMIN+12 waybar",
-        "on-click-right": "xdg-open https://wttr.in/Madrid"
+        "on-click-right": "~/.config/hypr/scripts/Weather.py --city",
+        "on-click-middle": "xdg-open \"https://wttr.in/$(cat ~/.config/hypr/weather-city 2>/dev/null)\""
     },
     // Se usa "ext/workspaces" (protocolo ext-workspace-v1) y NO
     // "hyprland/workspaces": este último manda por IPC la sintaxis vieja
