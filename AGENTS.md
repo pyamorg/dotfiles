@@ -17,7 +17,10 @@ chezmoi apply
 Convenciones de chezmoi: `dot_config/` → `~/.config/`, prefijo `executable_`
 para scripts, sufijo `.tmpl` para plantillas, `private_` para permisos 600.
 `.chezmoiignore` excluye lo que no debe salir al home (`install-packages.sh`,
-`system/`, este fichero).
+`theme.sh`, `system/`, este fichero).
+
+`chezmoi apply` sin argumentos se cuelga en este repo (algún prompt): usa
+`chezmoi apply --no-tty --force ~/.config/<ruta>`.
 
 Recargas tras aplicar:
 
@@ -110,6 +113,51 @@ ni `wtype`). Estrategias que sí funcionan:
 - Batería `CMB0`. VPN WireGuard `pyam-minipyam` en NetworkManager.
 - No hay agente de polkit corriendo: `pkexec` no sirve, usa udev o sudo.
 
+## Colores: una sola paleta
+
+**No hay colores literales en los configs.** Todo sale de
+`.chezmoidata/colors.yaml`, que chezmoi expone como `{{ .colors.X }}` en
+cualquier plantilla. Ficheros enganchados: `waybar/{style.css,config.jsonc}`,
+`rofi/{config,menu}.rasi`, `swaync/style.css`, `wlogout/{style.css,icons/*.svg}`,
+`kitty/kitty.conf`, `hypr/{hyprland.lua,hyprlock.conf}` y
+`hypr/colors.json` (este último para los scripts, que no pueden ser
+plantillas: `calendar-menu.py` lleva `{{` en un `-theme-str` de rofi).
+
+Las claves son **roles, no colores**: `accent`/`accent2`/`accent3` salen del
+tono dominante del fondo; los neutros (`crust`…`text`) son una rampa teñida
+con ese mismo tono; los semánticos (`red`, `yellow`, `green`…) mantienen su
+tono fijo para no perder significado. En los CSS se conservan los nombres
+locales de siempre (`@blue` = `accent`, `@mauve` = `accent2`,
+`@lavender` = `accent3`) para no tocar el cuerpo de las hojas.
+
+`./theme.sh` (raíz del repo, ignorado por chezmoi) regenera el yaml:
+
+```bash
+./theme.sh --dry-run          # enseña la paleta en color, sin escribir
+./theme.sh                    # usa el fondo de hyprpaper.conf
+./theme.sh ~/Pictures/x.jpg   # usa otra imagen
+./theme.sh --reset            # vuelve a Catppuccin Mocha
+```
+
+Saca el histograma con ImageMagick (`-colors 16`), pondera cada tono por
+`píxeles × saturación²` para descartar grises, escribe el yaml, hace
+`chezmoi apply` **sólo de los ficheros del tema** (aplicar directorios
+enteros arrastraría cambios ajenos, p.ej. el bloque de HyprMod en
+`hyprland.lua`), regenera los PNG de wlogout con `rsvg-convert` y recarga
+waybar, swaync, hyprland y kitty.
+
+## Notificaciones
+
+`timeout-critical` en `swaync/config.json` estaba a **0 = no expira nunca**;
+por eso los avisos se quedaban en pantalla hasta cerrarlos a mano. Ahora son
+8 s. Además **swaync ignora el `-t` de `notify-send` en las críticas**
+(verificado: con `-t 2000` seguía en pantalla a los 3,5 s), así que la única
+palanca es la config.
+
+Regla: `-u critical` sólo para lo que de verdad interrumpe (batería baja).
+Un fallo de conexión o un comando que no está instalado va con urgencia
+normal y `-i dialog-error`.
+
 ## Mapa de scripts (`dot_config/hypr/scripts/`)
 
 | Script | Qué hace |
@@ -122,6 +170,8 @@ ni `wtype`). Estrategias que sí funcionan:
 | `battery-watch.sh` | Bucle que al 15% baja el brillo y avisa; lo restaura al enchufar |
 | `proc-menu.sh` | `cpu`/`mem`: top 12, Enter mata el proceso |
 | `music.sh` | Reproductor; esconde la cápsula tras 5 min en pausa |
+| `calendar-menu.py` | Agenda de los calendarios CalDAV (evolution-data-server): reloj de la barra (`--clock`) con rejilla mensual en el tooltip, cápsula del próximo evento, menú con detalle, alta rápida en español, borrado y visibilidad de calendarios |
+| `Weather.py` | Tiempo de wttr.in (j1, `lang=es`) con caché de 15 min: icono según cielo/día-noche y tooltip con detalles y previsión de 3 días. `--tooltip` lo imprime suelto |
 | `dnd.sh` | Silencio de notificaciones (swaync) |
 | `clipboard-menu.sh` | Historial de cliphist |
 | `control-center.sh` | Menú raíz con todo lo anterior (Super+C) |
@@ -130,7 +180,53 @@ ni `wtype`). Estrategias que sí funcionan:
 Patrón de los módulos custom: `script.sh --status` imprime
 `{"text","class","tooltip"}` y `script.sh` a secas alterna y manda
 `pkill -RTMIN+N waybar` para refrescar al instante. Señales en uso: 8
-caffeine, 9 red, 10 dnd.
+caffeine, 9 red, 10 dnd, 11 agenda, 12 tiempo.
+
+Si el módulo emite JSON con `json.dumps`, hace falta `ensure_ascii=False`: con
+los escapes `\uXXXX` los iconos fuera del BMP salen como pares subrogados y
+waybar descarta el módulo entero sin decir nada.
+
+## Calendarios
+
+Los eventos salen de evolution-data-server, las mismas cuentas CalDAV de
+Nextcloud que usa GNOME Calendar (`~/.config/evolution/sources/*.source`). Se
+leen con `gi.repository.ECal` y `EDataServer`; no hace falta khal ni
+vdirsyncer. Detalles que costaron:
+
+- El callback de `generate_instances_sync` recibe un `ICalGLib.Component`, no
+  un `ECal.Component`: no tiene `get_icalcomponent()`.
+- Cada instancia trae su propia zona horaria, así que `set_default_timezone()`
+  no cambia nada; hay que convertir con `as_timet_with_zone(t.get_timezone())`.
+- Los eventos nuevos se guardan en UTC para no tener que emitir un VTIMEZONE.
+
+El reloj de la barra **no** es el módulo `clock` nativo, sino `custom/clock`
+(el mismo script con `--clock`): el nativo pinta el mes en el tooltip pero no
+sabe colorear días sueltos, y aquí cada día lleva un punto por calendario con
+eventos. Notas:
+
+- Sin `interval`: el script imprime en bucle y duerme `60 - segundo actual`,
+  así la hora nunca se retrasa. `restart-interval: 5` lo resucita si muere.
+- **El bucle no llama nunca a evolution-data-server.** Pinta el tooltip desde
+  la caché (`load_events(offline=True)`) y quien la refresca es `--status`,
+  que corre en su propio proceso. Leer de EDS puede tardar minutos si un
+  backend está sincronizando, y eso congelaba la hora en pantalla.
+- El 3er argumento de `ECal.Client.connect_sync` son los *segundos a esperar
+  a que el backend esté online*, no un timeout de error: con 15 y cuatro
+  calendarios se pagaban 60 s antes de leer nada. Para leer va 0.
+- Un backend CalDAV enfermo deja las llamadas síncronas colgadas para
+  siempre (visto: `Personal` bloqueó un `--status` durante 23 minutos, y
+  reiniciar `evolution-calendar-factory` no bastó). Por eso cada llamada va
+  envuelta en `deadline()`, un `Gio.Cancellable` que se cancela solo a los
+  `CALL_LIMIT` segundos: el calendario que no responde se salta y los demás
+  siguen.
+- El menú usa `events_for_ui()`: pinta la caché aunque esté vieja y lanza el
+  refresco aparte, para abrir siempre al instante.
+- Los puntos de la rejilla son `•` (U+2022), de ancho normal en la
+  monoespaciada; `●` sería *wide* y descuadraría las columnas.
+- Los dos meses van en columnas (`side_by_side`), no apilados: apilados el
+  tooltip salía estrechísimo y larguísimo.
+- Para ver el tooltip sin poder hacer hover:
+  `calendar-menu.py --tooltip | pango-view --markup -q -o /tmp/tt.png /dev/stdin`.
 
 ## Rendimiento
 
