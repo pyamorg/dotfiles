@@ -1,23 +1,25 @@
-/* ~/.config/waybar/style.css
-   Paleta Catppuccin Mocha, la misma que usan hyprland, swaync y wlogout.
+/* ~/.config/waybar/style.css — generado por chezmoi desde .chezmoidata/colors.yaml
+   No lo edites en ~/.config: se sobrescribe. Los colores salen de la paleta
+   común (./theme.sh la regenera a partir del fondo de escritorio).
    Cápsulas individuales bien separadas (nada agrupado) para no
    equivocarse de clic, salvo el reloj, que despliega acciones rápidas. */
 
-@define-color base     #1e1e2e;
-@define-color surface0 #313244;
-@define-color surface1 #45475a;
-@define-color overlay0 #6c7086;
-@define-color subtext0 #a6adc8;
-@define-color text     #cdd6f4;
-@define-color blue     #89b4fa;
-@define-color lavender #b4befe;
-@define-color sapphire #74c7ec;
-@define-color teal     #94e2d5;
-@define-color green    #a6e3a1;
-@define-color yellow   #f9e2af;
-@define-color peach    #fab387;
-@define-color red      #f38ba8;
-@define-color mauve    #cba6f7;
+@define-color base     {{ .colors.base }};
+@define-color surface0 {{ .colors.surface0 }};
+@define-color surface1 {{ .colors.surface1 }};
+@define-color overlay0 {{ .colors.overlay0 }};
+@define-color subtext0 {{ .colors.subtext0 }};
+@define-color text     {{ .colors.text }};
+@define-color blue     {{ .colors.accent }};
+@define-color lavender {{ .colors.accent3 }};
+@define-color mauve    {{ .colors.accent2 }};
+@define-color sapphire {{ .colors.sapphire }};
+@define-color sky      {{ .colors.sky }};
+@define-color teal     {{ .colors.teal }};
+@define-color green    {{ .colors.green }};
+@define-color yellow   {{ .colors.yellow }};
+@define-color peach    {{ .colors.peach }};
+@define-color red      {{ .colors.red }};
 
 * {
     font-family: "JetBrainsMono Nerd Font", sans-serif;
@@ -34,6 +36,7 @@ window#waybar {
 /* ---------- Cápsulas ---------- */
 
 #clock-actions,
+#custom-agenda,
 #custom-weather,
 #custom-music,
 #workspaces,
@@ -60,6 +63,7 @@ window#waybar {
 /* Feedback al pasar el ratón: todos estos módulos son clicables y antes
    no daban ninguna señal de serlo. */
 #custom-weather:hover,
+#custom-agenda:hover,
 #custom-swaync:hover,
 #cpu:hover,
 #memory:hover,
@@ -185,6 +189,34 @@ window#waybar.empty #window {
     background: @text;
 }
 
+/* ---------- Agenda ---------- */
+
+#custom-agenda {
+    margin-right: 6px;
+    color: @lavender;
+}
+
+/* Sin eventos a la vista el módulo imprime texto vacío: sin este padding a
+   cero quedaría una cápsula fantasma en mitad de la barra. */
+#custom-agenda.empty {
+    padding: 0;
+    margin: 0;
+    border: none;
+    background: transparent;
+}
+
+#custom-agenda.soon {
+    color: @peach;
+    border-color: alpha(@peach, 0.5);
+}
+
+/* Evento en curso: mismo tratamiento que .soon (texto y borde teñidos). El
+   relleno sólido verde cantaba demasiado en mitad de la barra. */
+#custom-agenda.live {
+    color: @green;
+    border-color: alpha(@green, 0.5);
+}
+
 /* ---------- Reloj + acciones rápidas (drawer) ---------- */
 #clock-actions {
     padding: 0 4px;
@@ -196,7 +228,7 @@ window#waybar.empty #window {
 
 /* El reloj y los pills viven DENTRO de la cápsula del grupo, así que no
    llevan fondo ni borde propios. */
-#clock-actions #clock {
+#clock-actions #custom-clock {
     background: transparent;
     border: none;
     padding: 0 10px;
@@ -255,6 +287,17 @@ window#waybar.empty #window {
 /* ---------- Acentos por módulo ---------- */
 
 #custom-weather        { color: @sapphire; }
+/* El icono cambia de color con la condición del cielo. */
+#custom-weather.clear   { color: @yellow; }
+#custom-weather.partly  { color: @peach; }
+#custom-weather.cloud   { color: @subtext0; }
+#custom-weather.fog     { color: @overlay0; }
+#custom-weather.rain    { color: @sapphire; }
+#custom-weather.sleet,
+#custom-weather.snow    { color: @sky; }
+#custom-weather.storm   { color: @mauve; }
+#custom-weather.stale,
+#custom-weather.offline { color: @overlay0; }
 #cpu                   { color: @peach; }
 #memory                { color: @green; }
 #custom-network        { color: @blue; }

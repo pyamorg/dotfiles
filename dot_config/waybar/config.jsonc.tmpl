@@ -15,6 +15,7 @@
         "custom/music"
     ],
     "modules-center": [
+        "custom/agenda",
         "group/clock-actions"
     ],
     "modules-right": [
@@ -43,7 +44,7 @@
             "transition-left-to-right": true
         },
         "modules": [
-            "clock",
+            "custom/clock",
             "custom/screenshot",
             "custom/screenshot-full",
             "custom/colorpicker",
@@ -164,30 +165,44 @@
         "on-scroll-up": "playerctl position 5+",
         "on-scroll-down": "playerctl position 5-"
     },
-    "clock": {
-        "format": "{:%H:%M  %d/%m}",
-        "tooltip-format": "<tt><small>{calendar}</small></tt>",
-        "on-click": "gnome-calendar",
-        "calendar": {
-            "mode": "month",
-            "weeks-pos": "right",
-            "on-scroll": 1,
-            "format": {
-                "months": "<span color='#d4d4d8'><b>{}</b></span>",
-                "days": "<span color='#a1a1aa'>{}</span>",
-                "weekdays": "<span color='#71717a'><b>{}</b></span>",
-                "today": "<span color='#b34747'><b><u>{}</u></b></span>"
-            }
-        }
+    // Reloj propio en vez del módulo "clock": el nativo pinta el mes en el
+    // tooltip pero no sabe colorear días sueltos, y aquí cada día lleva un
+    // punto por calendario con eventos. Sin "interval": el script imprime en
+    // bucle, alineado al minuto en punto, para que la hora no se retrase.
+    "custom/clock": {
+        "format": "{}",
+        "return-type": "json",
+        "exec": "~/.config/hypr/scripts/calendar-menu.py --clock",
+        "restart-interval": 5,
+        "on-click": "~/.config/hypr/scripts/calendar-menu.py",
+        "on-click-right": "gnome-calendar"
+    },
+    // Próximo evento de los calendarios CalDAV (evolution-data-server, las
+    // mismas cuentas de GNOME Calendar). Se esconde cuando no hay nada a la
+    // vista; el script refresca la cápsula con pkill -RTMIN+11.
+    "custom/agenda": {
+        "format": "{}",
+        "return-type": "json",
+        "exec": "~/.config/hypr/scripts/calendar-menu.py --status",
+        "interval": 60,
+        "signal": 11,
+        "escape": false,
+        "on-click": "~/.config/hypr/scripts/calendar-menu.py",
+        "on-click-right": "gnome-calendar",
+        "on-click-middle": "~/.config/hypr/scripts/calendar-menu.py --sync"
     },
     "custom/weather": {
         "format": "{}",
-        "on-click": "xdg-open https://wttr.in/Madrid",
-        "interval": 3600,
         "return-type": "json",
         "exec": "~/.config/hypr/scripts/Weather.py",
-        "exec-if": "ping wttr.in -c1",
-        "tooltip": true
+        // Sin "exec-if": el script ya tiene timeout y caché propia, y el
+        // ping bloqueaba la barra cuando la red estaba lenta.
+        "interval": 900,
+        "signal": 12,
+        "escape": false,
+        "tooltip": true,
+        "on-click": "rm -f \"${XDG_RUNTIME_DIR:-/tmp}/waybar-weather.json\"; pkill -RTMIN+12 waybar",
+        "on-click-right": "xdg-open https://wttr.in/Madrid"
     },
     // Se usa "ext/workspaces" (protocolo ext-workspace-v1) y NO
     // "hyprland/workspaces": este último manda por IPC la sintaxis vieja
