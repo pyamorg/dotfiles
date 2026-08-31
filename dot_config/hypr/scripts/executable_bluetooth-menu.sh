@@ -69,5 +69,5 @@ fi
 if bluetoothctl connect "$selected" >/dev/null 2>&1; then
     notify-send -a waybar -i bluetooth "Bluetooth" "Conectado $label"
 else
-    notify-send -a waybar -u critical -i bluetooth "Bluetooth" "No se pudo conectar a $label"
+    notify-send -a waybar -i dialog-error "Bluetooth" "No se pudo conectar a $label"
 fi

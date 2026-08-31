@@ -35,4 +35,4 @@ name=$(ps -p "$selected" -o comm= 2>/dev/null || true)
 
 kill "$selected" 2>/dev/null &&
     notify-send -a waybar "Proceso terminado" "$name ($selected)" ||
-    notify-send -a waybar -u critical "No se pudo terminar" "$name ($selected)"
+    notify-send -a waybar -i dialog-error "No se pudo terminar" "$name ($selected)"

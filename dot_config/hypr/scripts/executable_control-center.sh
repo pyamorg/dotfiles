@@ -7,6 +7,7 @@ THEME="$HOME/.config/rofi/menu.rasi"
 SCRIPTS="$HOME/.config/hypr/scripts"
 
 rows=(
+    "󰃭  Agenda"
     "󰤨  Red y VPN"
     "󰂯  Bluetooth"
     "󰕾  Salida de audio"
@@ -19,6 +20,7 @@ rows=(
     "󰐥  Apagar…"
 )
 actions=(
+    "$SCRIPTS/calendar-menu.py"
     "$SCRIPTS/wifi-menu.sh"
     "$SCRIPTS/bluetooth-menu.sh"
     "$SCRIPTS/audio-menu.sh output"
@@ -33,7 +35,7 @@ actions=(
 
 choice=$(printf '%s\n' "${rows[@]}" |
     rofi -dmenu -i -theme "$THEME" -p "󰕮  Control" -format i -no-custom \
-        -theme-str 'listview { lines: 10; }') || exit 0
+        -theme-str 'listview { lines: 11; }') || exit 0
 
 # exec para que el submenú herede el proceso y el bind de cierre siga valiendo.
 exec ${actions[$choice]}

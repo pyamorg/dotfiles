@@ -95,7 +95,7 @@ __vpn__*)
     elif nmcli connection up id "$vpn" >/dev/null 2>&1; then
         notify-send -a waybar -i network-vpn "VPN" "Conectada $vpn"
     else
-        notify-send -a waybar -u critical -i network-error "VPN" "No se pudo conectar a $vpn"
+        notify-send -a waybar -i network-error "VPN" "No se pudo conectar a $vpn"
     fi
     pkill -RTMIN+9 waybar 2>/dev/null || true
     exit 0
@@ -107,7 +107,7 @@ if nmcli -t -f NAME connection show | sed 's/\\:/:/g' | grep -qxF "$selected"; t
     if nmcli connection up id "$selected" ifname "$iface" >/dev/null 2>&1; then
         notify-send -a waybar -i network-wireless "Wifi" "Conectado a $selected"
     else
-        notify-send -a waybar -u critical -i network-error "Wifi" "No se pudo conectar a $selected"
+        notify-send -a waybar -i network-error "Wifi" "No se pudo conectar a $selected"
     fi
     pkill -RTMIN+9 waybar 2>/dev/null || true
     exit 0
@@ -129,6 +129,6 @@ fi
 if [[ $result == *successfully* ]]; then
     notify-send -a waybar -i network-wireless "Wifi" "Conectado a $selected"
 else
-    notify-send -a waybar -u critical -i network-error "Wifi" "$result"
+    notify-send -a waybar -i network-error "Wifi" "$result"
 fi
 pkill -RTMIN+9 waybar 2>/dev/null || true

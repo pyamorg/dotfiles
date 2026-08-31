@@ -5,7 +5,7 @@ set -euo pipefail
 THEME="$HOME/.config/rofi/menu.rasi"
 
 if ! command -v cliphist >/dev/null; then
-    notify-send -a waybar -u critical -i edit-paste "Portapapeles" \
+    notify-send -a waybar -i dialog-error "Portapapeles" \
         "Falta cliphist: sudo pacman -S cliphist"
     exit 1
 fi

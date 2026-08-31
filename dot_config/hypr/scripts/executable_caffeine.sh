@@ -77,7 +77,7 @@ else
         refresh_waybar
         notify-send \
             --icon=dialog-error \
-            --urgency=critical \
+            --urgency=normal \
             "Caffeine falló" \
             "No se pudo activar el inhibidor. Revisa systemd-inhibit." \
             -t 5000

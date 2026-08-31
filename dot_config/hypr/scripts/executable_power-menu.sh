@@ -35,7 +35,7 @@ __care__)
     if echo "$target" >"$CARE" 2>/dev/null; then
         notify-send -a waybar -i battery "Batería" "Tope de carga al $target%"
     else
-        notify-send -a waybar -u critical -i battery "Batería" \
+        notify-send -a waybar -i dialog-error "Batería" \
             "Sin permiso de escritura en $CARE. Instala system/99-lg-laptop.rules."
     fi
     ;;
