@@ -365,6 +365,11 @@ hl.window_rule({
     tile  = true,
 })
 
+hl.window_rule({
+    name = "kitty-no-maximize",
+    match = { class = "^(kitty)$" },
+    fullscreen_state = "0 0",
+})
 
 ---------------------------
 ---- REGLAS DE CAPA ----
