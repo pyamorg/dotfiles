@@ -12,3 +12,6 @@ system
 
 # Documentación del repo.
 AGENTS.md
+
+# Basura de Python: los scripts se ejecutan desde el home.
+**/__pycache__

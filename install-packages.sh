@@ -16,6 +16,7 @@ sudo pacman -S --needed --noconfirm \
     zsh \
     gnome-calendar gnome-online-accounts gnome-keyring \
     python-requests gnome-system-monitor nvtop \
+    kitty thunar btop qt5ct qt6ct \
     qt6-declarative qt6-5compat qt6-multimedia qt6-multimedia-ffmpeg \
     gst-plugins-base gst-plugins-good gst-plugins-bad gst-plugins-ugly fzf
 
@@ -28,8 +29,17 @@ sudo pacman -S --needed --noconfirm \
     hypridle hyprlock hyprpaper \
     brightnessctl \
     network-manager-applet blueman pavucontrol \
-    cliphist \
+    cliphist playerctl \
     ttf-jetbrains-mono-nerd
+
+# Estas hoy entran como dependencias de otros paquetes, pero los dotfiles las
+# usan de forma directa: hay que pedirlas explícitamente o pueden no estar.
+#   python-gobject/evolution-data-server -> calendar-menu.py
+#   imagemagick/librsvg                  -> theme.sh
+echo "--> Dependencias directas de los scripts (no dejarlas como transitivas)..."
+sudo pacman -S --needed --noconfirm \
+    python-gobject evolution-data-server \
+    imagemagick librsvg
 
 echo "--> Paquetes AUR personales..."
 yay -S --needed --noconfirm wlogout quickshell

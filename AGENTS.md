@@ -174,7 +174,7 @@ normal y `-i dialog-error`.
 | `battery-watch.sh` | Bucle que al 15% baja el brillo y avisa; lo restaura al enchufar |
 | `proc-menu.sh` | `cpu`/`mem`: top 12, Enter mata el proceso |
 | `music.sh` | Reproductor; esconde la cápsula tras 5 min en pausa |
-| `calendar-menu.py` | Agenda de los calendarios CalDAV (evolution-data-server): reloj de la barra (`--clock`) con rejilla mensual en el tooltip, cápsula del próximo evento, menú con detalle, alta rápida en español, borrado y visibilidad de calendarios |
+| `calendar-menu.py` | Agenda de los calendarios CalDAV (evolution-data-server): reloj de la barra (`--clock`) con rejilla mensual en el tooltip, cápsula del próximo evento, menú con detalle, alta rápida en español, borrado, silenciar/marcar como hecho y visibilidad de calendarios |
 | `Weather.py` | Tiempo de wttr.in (j1, `lang=es`) con caché de 15 min: icono según cielo/día-noche y tooltip con detalles y previsión de 3 días. La ubicación vive en `~/.config/hypr/weather-city`, que chezmoi crea con `create_` y luego no vuelve a tocar: sin ciudad = por IP, y se cambia con `--city`; `--tooltip` lo imprime suelto |
 | `dnd.sh` | Silencio de notificaciones (swaync) |
 | `clipboard-menu.sh` | Historial de cliphist |
@@ -231,6 +231,12 @@ eventos. Notas:
   tooltip salía estrechísimo y larguísimo.
 - Para ver el tooltip sin poder hacer hover:
   `calendar-menu.py --tooltip | pango-view --markup -q -o /tmp/tt.png /dev/stdin`.
+- «Hecho» y «silenciar» no tocan el servidor: son estado local en
+  `~/.config/hypr/agenda-dismissed.json`, con clave por *instancia*
+  (`fuente|uid|inicio`) para no ocultar las repeticiones futuras. Ese fichero
+  no puede vivir en la caché de `$XDG_RUNTIME_DIR`: `poke_waybar()` la borra.
+  Y esos cambios refrescan con `poke_waybar(refetch=False)`: borrar la caché
+  obliga a releer EDS y la cápsula se queda con el texto viejo mientras tanto.
 
 ## Rendimiento
 

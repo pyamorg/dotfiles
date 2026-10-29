@@ -406,5 +406,6 @@ for _, button in ipairs({ "mouse:272", "mouse:273", "mouse:274" }) do
     hl.bind(button, close_rofi_on_outside_click, { mouse = true, non_consuming = true })
 end
 
--- HyprMod managed settings
-require("hyprland-gui")
+-- HyprMod managed settings. Con pcall para que un fichero borrado o a medio
+-- escribir por la GUI no tumbe el resto de la configuración.
+pcall(require, "hyprland-gui")

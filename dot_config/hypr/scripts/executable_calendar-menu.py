@@ -56,6 +56,7 @@ I_TRASH = "\U000f01b4"
 I_BACK = "\U000f004d"
 I_EYE = "\U000f0208"
 I_OPEN = "\U000f03cc"
+I_MUTE = "\U000f009b"
 
 C_TEXT = "#cdd6f4"
 C_MUTED = "#6c7086"
@@ -79,6 +80,9 @@ except (OSError, ValueError, KeyError):
 HOME = Path.home()
 THEME = HOME / ".config/rofi/menu.rasi"
 CACHE = Path(os.environ.get("XDG_RUNTIME_DIR") or "/tmp") / "waybar-agenda.json"
+# Eventos apartados: no se borran del calendario, solo dejan de anunciarse en
+# la barra. Va fuera de la caché porque esta se tira en cada refresco.
+DISMISSED = HOME / ".config/hypr/agenda-dismissed.json"
 CACHE_TTL = 120
 DAYS_AHEAD = 21
 CONNECT_TIMEOUT = 15
@@ -269,6 +273,40 @@ def events_for_ui():
     return load_events()
 
 
+# --------------------------------------------------------------------------
+# Eventos silenciados o marcados como hechos
+# --------------------------------------------------------------------------
+
+def ev_key(ev):
+    """Identifica la instancia concreta, no la serie: el 'hecho' de hoy no
+    debe ocultar la repetición de mañana."""
+    return f"{ev['source']}|{ev['uid']}|{ev['start']}"
+
+
+def load_dismissed():
+    try:
+        data = json.loads(DISMISSED.read_text())
+    except (OSError, ValueError):
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def set_dismissed(ev, kind):
+    """kind: 'done', 'muted' o None para volver a mostrarlo."""
+    data = load_dismissed()
+    if kind is None:
+        data.pop(ev_key(ev), None)
+    else:
+        data[ev_key(ev)] = {"kind": kind, "until": ev["end"]}
+    cutoff = time.time() - 86400
+    data = {k: v for k, v in data.items() if v.get("until", 0) > cutoff}
+    try:
+        DISMISSED.parent.mkdir(parents=True, exist_ok=True)
+        DISMISSED.write_text(json.dumps(data))
+    except OSError as err:
+        notify("Agenda", f"No se pudo guardar: {err}", True)
+
+
 def refresh_remote():
     """Pide a cada calendario que sincronice contra el servidor."""
     reg = registry()
@@ -358,8 +396,10 @@ def cmd_status(_args):
 
     now = time.time()
     today = date.today()
-    live = [e for e in events if e["start"] <= now < e["end"] and not e["allday"]]
-    ahead = [e for e in events if e["start"] > now]
+    hidden = load_dismissed()
+    loud = [e for e in events if ev_key(e) not in hidden]
+    live = [e for e in loud if e["start"] <= now < e["end"] and not e["allday"]]
+    ahead = [e for e in loud if e["start"] > now]
     todays = [e for e in events if datetime.fromtimestamp(e["start"]).date() == today]
 
     nxt = live[0] if live else (ahead[0] if ahead else None)
@@ -386,7 +426,11 @@ def cmd_status(_args):
     lines.append(f"<b>{esc(day_label(today))} · {len(todays)} evento(s)</b>")
     for ev in todays[:6]:
         stamp = "todo el día" if ev["allday"] else f"{datetime.fromtimestamp(ev['start']):%H:%M}"
-        mark = I_DONE if ev["end"] <= now else "·"
+        state = hidden.get(ev_key(ev))
+        if state:
+            mark = I_DONE if state["kind"] == "done" else I_MUTE
+        else:
+            mark = I_DONE if ev["end"] <= now else "·"
         lines.append(f"{mark} <span color='{ev['color']}'>{stamp}</span>  {esc(ellipsis(ev['summary'], 40))}")
 
     # ensure_ascii=False: con los escapes \uXXXX los iconos fuera del BMP salen
@@ -517,10 +561,14 @@ def tooltip_markup():
     lines.append(rule)
 
     if todays:
+        hidden = load_dismissed()
         for ev in todays[:5]:
             stamp = "todo el día" if ev["allday"] else f"{datetime.fromtimestamp(ev['start']):%H:%M}"
             body_txt = esc(ellipsis(ev["summary"], 32))
-            if ev["end"] <= now:
+            state = hidden.get(ev_key(ev))
+            if state and state["kind"] == "done":
+                body_txt = f"<span color='{C_MUTED}'><s>{body_txt}</s></span>"
+            elif state or ev["end"] <= now:
                 body_txt = f"<span color='{C_MUTED}'>{body_txt}</span>"
             elif ev["start"] <= now:
                 body_txt = f"<span color='{C_LIVE}'><b>{body_txt}</b></span>"
@@ -612,8 +660,11 @@ def notify(title, body="", error=False):
     )
 
 
-def poke_waybar():
-    CACHE.unlink(missing_ok=True)
+def poke_waybar(refetch=True):
+    """refetch=False para cambios locales: tirar la caché obligaría a releer
+    evolution-data-server y la cápsula se quedaría con el texto viejo."""
+    if refetch:
+        CACHE.unlink(missing_ok=True)
     subprocess.run(["pkill", f"-RTMIN+{WAYBAR_SIGNAL}", "waybar"], check=False)
 
 
@@ -633,6 +684,7 @@ def spawn(argv):
 def build_rows(events):
     """Devuelve (filas de rofi, acciones paralelas)."""
     now = time.time()
+    hidden = load_dismissed()
     rows, actions = [], []
     current_day = None
     first_pending = None
@@ -653,7 +705,8 @@ def build_rows(events):
             actions.append(("noop", None))
 
         past = ev["end"] <= now
-        if not past and first_pending is None:
+        state = hidden.get(ev_key(ev))
+        if not past and state is None and first_pending is None:
             first_pending = len(rows)
         live = ev["start"] <= now < ev["end"]
         if ev["allday"]:
@@ -667,6 +720,11 @@ def build_rows(events):
             title = f"<b>{title}</b>"
         colour = C_MUTED if past else C_TEXT
         stamp_colour = C_LIVE if live else (C_MUTED if past else C_SUB)
+        if state:
+            bullet = I_DONE if state["kind"] == "done" else I_MUTE
+            colour = stamp_colour = C_MUTED
+            if state["kind"] == "done":
+                title = f"<s>{title}</s>"
         rows.append(
             f"<span color='{ev['color']}'>{bullet}</span> "
             f"<span color='{stamp_colour}'>{stamp}</span>  "
@@ -740,15 +798,28 @@ def menu(events):
 def event_menu(ev):
     url = meeting_url(ev)
     while True:
+        state = load_dismissed().get(ev_key(ev))
         mesg = [f"<b>{esc(ev['summary'])}</b>",
                 f"<span color='{C_SUB}'>{I_CLOCK} {esc(when_text(ev))}</span>",
                 f"<span color='{ev['color']}'>●</span> <span color='{C_MUTED}'>{esc(ev['calendar'])}</span>"]
+        if state:
+            done = state["kind"] == "done"
+            mesg.append(f"<span color='{C_WARN}'>{I_DONE if done else I_MUTE} "
+                        f"{'Marcado como hecho' if done else 'Silenciado'}: no aparece en la barra</span>")
         if ev["location"]:
             mesg.insert(2, f"<span color='{C_SUB}'>{I_PIN} {esc(ellipsis(ev['location'], 54))}</span>")
         if ev["description"]:
             mesg.append(f"<span color='{C_MUTED}'>{esc(ellipsis(ev['description'], 110))}</span>")
 
         rows, actions = [], []
+        if state:
+            rows.append(f"{I_EYE}  Volver a mostrarlo en la barra")
+            actions.append("restore")
+        else:
+            rows.append(f"{I_DONE}  Marcar como hecho")
+            actions.append("done")
+            rows.append(f"{I_MUTE}  Silenciar en la barra")
+            actions.append("mute")
         if url:
             rows.append(f"{I_VIDEO}  Abrir enlace")
             actions.append("open-url")
@@ -771,6 +842,10 @@ def event_menu(ev):
             return
         action = actions[idx]
         if action == "back":
+            return
+        if action in ("done", "mute", "restore"):
+            set_dismissed(ev, None if action == "restore" else action.replace("mute", "muted"))
+            poke_waybar(refetch=False)
             return
         if action == "open-url":
             spawn(["xdg-open", url])
